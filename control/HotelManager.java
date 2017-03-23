@@ -6,6 +6,7 @@ public class HotelManager {
 		// TODO Auto-generated method stub
 			/* Noop*/
 		int i = 1;
+		int i4 = 4;
 	}
 
 }
