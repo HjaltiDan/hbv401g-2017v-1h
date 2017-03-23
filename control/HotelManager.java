@@ -7,6 +7,7 @@ public class HotelManager {
 			/* Noop*/
 		int i = 1;
 		int i4 = 4;
+		int i5 = 5;
 	}
 
 }
