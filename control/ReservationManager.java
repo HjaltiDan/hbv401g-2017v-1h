@@ -5,5 +5,6 @@ public class ReservationManager {
 
 	int i2 = 2;
 	int rm2 = 2;
+	int rm3 = 3;
 	
 }
