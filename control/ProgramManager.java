@@ -18,6 +18,12 @@ public class ProgramManager {
 		ReservationView rv = new ReservationView();
 		ReservationManager rm = new ReservationManager();
 
+		SearchView sv = new SearchView();
+		
+		rv.setVisible(false);
+		sv.setVisible(true);
+		
+		
 		rm.addReservationView(rv);
 		rv.addReservationManager(rm);
 		

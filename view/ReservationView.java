@@ -104,6 +104,10 @@ public class ReservationView extends Observable {
 		//btnConfirm.addActionListener((ActionListener)rm);	//need instance of controller before can add it as a listener 
 	}
 
+	public void setVisible(boolean state){
+		frame.setVisible(state);
+	}
+	
 	/** public void addResultsView(ResultsView v){
 		this.rsv = v;
 	}
