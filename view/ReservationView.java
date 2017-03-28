@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.JPanel;
@@ -22,6 +23,19 @@ public class ReservationView extends Observable {
 	private JButton btnConfirm = new JButton();
 	int counter = 0;
 	private ReservationManager resm = new ReservationManager();
+	
+	
+	private ArrayList<String> dates;
+	private int numberOfGuests;
+	private String fullName;
+	private String email;
+	private int phoneNumber;
+	private String address;
+	
+	/** public void receiveSelection(chosenHotel Hotel String dates){
+	 * 
+	 * };
+	 */
 
 
 	/**
@@ -88,6 +102,60 @@ public class ReservationView extends Observable {
 		//System.out.println(rm.writeTempint());
 		//System.out.println("View      : adding controller");
 		//btnConfirm.addActionListener((ActionListener)rm);	//need instance of controller before can add it as a listener 
+	}
+
+	/** public void addResultsView(ResultsView v){
+		this.rsv = v;
+	}
+	 * 
+	 */
+	
+	public ArrayList<String> getDates() {
+		return dates;
+	}
+
+	public void setDates(ArrayList<String> dates) {
+		this.dates = dates;
+	}
+
+	public int getNumberOfGuests() {
+		return numberOfGuests;
+	}
+
+	public void setNumberOfGuests(int numberOfGuests) {
+		this.numberOfGuests = numberOfGuests;
+	}
+
+	public int getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(int phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	
 }
