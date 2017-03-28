@@ -19,7 +19,6 @@ public class Hotel {
 	private ArrayList<String> nearestSites;
 	private ArrayList<String> nearbyDayTours;
 	
-	
 	public Hotel(int hotelID){
 		this.hotelID = hotelID;
 	}
