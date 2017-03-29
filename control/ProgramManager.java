@@ -14,20 +14,31 @@ public class ProgramManager {
 
 	public static void main(String[] args) {
 
+		SearchView searchView = new SearchView();
+		ResultsView resultsView = new ResultsView();
+		ReservationView reservationView = new ReservationView();
 		
-		ReservationView rv = new ReservationView();
-		ReservationManager rm = new ReservationManager();
+		HotelManager hotelManager = new HotelManager();
+		ReservationManager reservationManager = new ReservationManager();
 
-		SearchView sv = new SearchView();
-		
-		rv.setVisible(false);
-		sv.setVisible(true);
 		
 		
-		rm.addReservationView(rv);
-		rv.addReservationManager(rm);
+		reservationView.setVisible(false);
+		searchView.setVisible(true);
 		
-		rv.addObserver(rm);
+		
+		reservationManager.addReservationView(reservationView);
+		reservationView.addReservationManager(reservationManager);
+		
+		hotelManager.addResultsView(resultsView);
+		resultsView.addHotelManager(hotelManager);
+		
+		hotelManager.addSearchView(searchView);
+		searchView.addHotelManager(hotelManager);
+		
+		reservationView.addObserver(reservationManager);
+		resultsView.addObserver(hotelManager);
+		searchView.addObserver(hotelManager);
 		
 		
 		

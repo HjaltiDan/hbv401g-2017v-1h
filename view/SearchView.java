@@ -45,7 +45,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-public class SearchView extends JFrame {
+public class SearchView extends Observable {
 
 	private JFrame frame;
 	private JPanel contentPane;
@@ -62,6 +62,10 @@ public class SearchView extends JFrame {
 	private JTextField textFieldHowMany;
 	JCheckBox chckbxAdvancedOptions;
 	JPanel advancedSearchPanel;
+
+	private HotelManager hotelManager = new HotelManager();
+	private ArrayList searchChoices = new ArrayList();
+	private ArrayList<Hotel> searchResults = new ArrayList();
 	
 	/**
 	 * Create the frame.
@@ -145,6 +149,18 @@ public class SearchView extends JFrame {
 		basicSearchPanel.add(chckbxAdvancedOptions);
 		
 		JButton btnSearch = new JButton("Search!");
+		btnSearch.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				setChanged();
+				notifyObservers();
+				searchChoices.clear();
+				searchChoices.add(comboEndYear.getSelectedItem());
+				searchResults = hotelManager.searchHotel(searchChoices);
+			}
+		});
+		
+		
 		btnSearch.setBounds(380, 88, 97, 25);
 		basicSearchPanel.add(btnSearch);
 		
@@ -186,7 +202,12 @@ public class SearchView extends JFrame {
 		//lblNewLabel.setVisible(true);
 		//lblNewLabel.setText("Show me now");
 		//comboStartDay.setVisible(state);
-		contentPane.repaint();
-		
+		contentPane.repaint();	
 	}
+	
+	public void addHotelManager(HotelManager hm)
+	{
+		this.hotelManager = hm;
+	}
+	
 }
