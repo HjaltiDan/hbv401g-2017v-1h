@@ -68,13 +68,25 @@ public class ResultsView extends Observable {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		frame.setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(10, 11, 583, 180);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		
+		JLabel lblNameOfHotel = new JLabel("Name of the Hotel");
+		lblNameOfHotel.setBounds(10, 11, 97, 14);
+		panel.add(lblNameOfHotel);
+		
+		JButton btnReserveARoom = new JButton("Reserve a Room");
+		btnReserveARoom.setBounds(462, 146, 111, 23);
+		panel.add(btnReserveARoom);
 	}
 
 	public void addHotelManager(HotelManager hm)
 	{
 		this.hm = hm;
 	}
-	
 }
