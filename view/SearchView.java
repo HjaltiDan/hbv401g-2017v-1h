@@ -66,6 +66,10 @@ public class SearchView extends Observable {
 	private HotelManager hotelManager = new HotelManager();
 	private ArrayList searchChoices = new ArrayList();
 	private ArrayList<Hotel> searchResults = new ArrayList();
+	private Calendar startDate;
+	private Calendar endDate;
+	private int numberOfGuests;
+	private boolean[] priceRange = new boolean[5];
 	
 	/**
 	 * Create the frame.
@@ -154,11 +158,15 @@ public class SearchView extends Observable {
 			public void mouseClicked(MouseEvent arg0) {
 				setChanged();
 				notifyObservers();
+				gatherSelectedOptions();
 				searchChoices.clear();
 				searchChoices.add(comboEndYear.getSelectedItem());
+				
 				searchResults = hotelManager.searchHotel(searchChoices);
 			}
 		});
+		
+		
 		
 		
 		btnSearch.setBounds(380, 88, 97, 25);
@@ -208,6 +216,17 @@ public class SearchView extends Observable {
 	public void addHotelManager(HotelManager hm)
 	{
 		this.hotelManager = hm;
+	}
+	
+	private void gatherSelectedOptions(){
+		searchChoices.clear();
+		startDate.set(comboStartYear.getSelectedIndex(), comboStartMonth.getSelectedIndex(), comboStartDay.getSelectedIndex());
+		
+		//comboStartDay
+		/*private Date startDate;
+	private Date endDate;
+	private int numberOfGuests;
+	private boolean[] priceRange = new boolean[5];*/
 	}
 	
 }
