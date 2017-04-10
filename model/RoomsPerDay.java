@@ -1,6 +1,7 @@
 package model;
 //import java.util.ArrayList; //For ArrayList, if we need it
 import java.time.*;
+import java.util.Comparator;
 
 public class RoomsPerDay {
 	private LocalDate day;
@@ -13,7 +14,7 @@ public class RoomsPerDay {
 	
 	public RoomsPerDay(RoomsPerDay rpd){
 //		if(rpd == null)
-//			System.exit(0);
+	//		System.exit(0);
 		this.day = rpd.getDay();
 		this.availableRooms = rpd.getAllAvailableRooms();
 	}
@@ -23,6 +24,22 @@ public class RoomsPerDay {
 		this.availableRooms = availableRooms;
 	}
 	
+	  /*Comparator for sorting the list by Date*/
+   public static Comparator<RoomsPerDay> RoomDaycomparator = new Comparator<RoomsPerDay>() {
+
+	public int compare(RoomsPerDay r1, RoomsPerDay r2) {
+	   LocalDate d1 = r1.getDay();
+	   LocalDate d2 = r2.getDay();
+	   int c = 0;
+	   if(d1.isBefore(d2))
+	   	c = -1;
+	   else if(d1.isAfter(d2))
+	   	c = 1;
+	   else if(d1.isEqual(d2))
+	   	c = 0;
+	   
+	   return c;
+   }};
 
 	
 	

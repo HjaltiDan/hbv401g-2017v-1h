@@ -1,4 +1,5 @@
 package model;
+import control.*;
 import java.util.*;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -9,7 +10,7 @@ public class Hotel {
 	private boolean[] priceRange;
 	private boolean[] openingMonths;
 	private String address;
-	private ArrayList<RoomsPerDay> freeRoomsPerDate;
+	private ArrayList<RoomsPerDay> freeRoomsPerDate = new ArrayList<RoomsPerDay>();
 	private int rating;
 	private boolean[] roomFacilities;
 	private int hotelType;
@@ -46,35 +47,113 @@ public class Hotel {
 	}
 	public Hotel(){}
 
+	public int numberofRoomDays(){
+		return freeRoomsPerDate.size();
+	}
+	
 	public int checkAvailability(LocalDate startDate, LocalDate endDate){
-		/*Algorithm: Cycle through all freeRoomsPerDate on the range
-		 * defined by startDate and endDate. Return the lowest
-		 * number in that range, since that's the highest number
-		 * the hotel can guarantee for *every* day during the date range.*/
-		long duration = ChronoUnit.DAYS.between(startDate, endDate);
+		if(endDate.isBefore(startDate))
+		{
+			System.out.println("Enddate was before startdate.");
+			return 0;
+		}		
+		long numberOfDays = ChronoUnit.DAYS.between(startDate, endDate)+1;
+		//System.out.println("Duration of stay is "+duration);
 		LocalDate day = startDate;
 		int maxPossibleRooms = 0;
-		RoomsPerDay dailyRoom = new RoomsPerDay(findRoomDay(startDate));
-		if(dailyRoom == null)
-			return 0;
-		maxPossibleRooms = dailyRoom.getAllAvailableRooms();
-		for(int i = 1; i <= duration; i++)
-		{
-			day = startDate.plusDays(i);
-			dailyRoom = new RoomsPerDay(findRoomDay(day));
-			if(dailyRoom == null)
-				return 0;
-			int roomsThatDay = dailyRoom.getAllAvailableRooms();
-			if(roomsThatDay < maxPossibleRooms)
-				maxPossibleRooms = roomsThatDay;
-		}
-		return maxPossibleRooms;
-	}
-
-	private RoomsPerDay findRoomDay(LocalDate date){
+		int currentPossibleRooms = 0;
+		boolean foundFirstDay = false;
+		int dayOfTrip = 0;
+		Collections.sort(freeRoomsPerDate, RoomsPerDay.RoomDaycomparator);
 		for(RoomsPerDay e : freeRoomsPerDate)
+		{
+			/*Let's iterate through the entire (sorted) list until we find
+			 * the first day the user searched for. If we find it, we're going
+			 * to break the for() loop at some point. If we didn't find it,
+			 * then startDay didn't even exist in our list, and we can
+			 * safely return 0 for max number of guests. */
+			LocalDate thatDay = e.getDay();
+			if(thatDay.isEqual(startDate))
+			{
+				/*Okay, our hotel at least has an entry for the very first day.
+				 * Let's iterate through them and find the lowest possible number
+				 * for any given day. REMEMBER that we cannot guarantee we'll have
+				 * database entries for each day - this class isn't in charge of the
+				 * raw data - so we have to compare days at every step. If the comparison
+				 * ever fails then our table was missing a day, and that means
+				 * we can return 0 for the whole trip.*/
+				foundFirstDay = true;
+				dayOfTrip = 0;
+				maxPossibleRooms = e.getAllAvailableRooms();
+				if(numberOfDays==1) return maxPossibleRooms; //One-day stay
+			}
+			if( (thatDay.isAfter(startDate)) && (thatDay.isBefore(endDate.plusDays(1))) )
+				/*We're in the date range we wanted to check*/
+			{
+				if( !(foundFirstDay) )
+					/* We've hit values in our sorted list that are later than our starting date,
+					 * but we never found an entry for the starting date itself. This means our 
+					 * hotel's list doesn't contain an entry for that day, so obviously it can't
+					 * offer our guests anything for the time period they requested.*/
+					return 0;
+
+				dayOfTrip++;
+				LocalDate tripDay = startDate.plusDays(dayOfTrip);
+				if( !(tripDay.isEqual(thatDay)))
+					/*There was a missing entry in the hotel's list of days, so again,
+					 * we can't offer them a valid number for this time period*/
+					return 0;
+				
+				currentPossibleRooms = e.getAllAvailableRooms();
+				if( currentPossibleRooms<maxPossibleRooms )
+					maxPossibleRooms = currentPossibleRooms;
+			}
+			
+			
+			if( (thatDay.isAfter(endDate)) )
+				/* (We don't need this condition here, by the way, but it'll save us having to
+				 * cyce through every single remaining entry in freeRoomsPerDate)
+				 * We've found the first day, passed through a valid date range with no dates
+				 * missing, and adjusted the maximum possible room number accordingly.
+				 * Now we've passed the final date, so we don't need to look at any more
+				 * entries, and can simply return maxPossibleRooms.
+				 * Remember that we set it to 0 initially, so even if some weird system
+				 * quirk forces us into this if loop without having met the proper conditions, 
+				 * we'll still just be returning a perfectly valid 0.
+				 * */
+				return maxPossibleRooms;
+	
+		}
+		return maxPossibleRooms; //And just for good measure
+			
+		}
+					
+				
+		/*
+
+		RoomsPerDay dailyRoom = new RoomsPerDay();
+		if (findRoomDay(startDate) == null)
+		{
+			//System.out.println("Hotel "+this.getName()+" has no room for that date.");
+			return 0;
+		}
+		dailyRoom = findRoomDay(startDate);
+		maxPossibleRooms = dailyRoom.getAllAvailableRooms();
+
+	}
+*/
+	private RoomsPerDay findRoomDay(LocalDate date){
+		//System.out.println("In findRoomDay(). Date is "+date.toString()+" .Size of freeRoomsPerDate is "+freeRoomsPerDate.size());
+		//System.out.println("In findRoomDay(). Variable date is "+date);
+		//System.out.println("Size of freeRoomsPerDate for hotel "+this.getName()+" is "+freeRoomsPerDate.size());
+		for(RoomsPerDay e : freeRoomsPerDate)
+		{
+			//Check this condition
+			System.out.println("e.getDay(): "+e.getDay());
+			System.out.println("LocalDate date: "+date);
 			if(e.getDay() == date)
 				return e;
+		}
 		return null;
 	}
 	
@@ -165,8 +244,11 @@ public class Hotel {
 	public ArrayList<RoomsPerDay> getFreeRoomsPerDate() {
 		return freeRoomsPerDate;
 	}
-	public void setFreeRoomsPerDate(ArrayList<RoomsPerDay> freeRoomsPerDate) {
-		this.freeRoomsPerDate = freeRoomsPerDate;
+	public void setFreeRoomsPerDate(ArrayList<RoomsPerDay> fr) {
+		//System.out.println("Got into setFreeRoomsPerDate for "+this.getName()+" and am about to add "+fr.size()+" rooms");
+		freeRoomsPerDate = new ArrayList<RoomsPerDay>(fr);
+		//System.out.println("freeRoomsPerDate for "+this.getName()+" now contains "+freeRoomsPerDate.size()+" elements.");
+		//this.freeRoomsPerDate = freeRoomsPerDate;
 	}
 	
 

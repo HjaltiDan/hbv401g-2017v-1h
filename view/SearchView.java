@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,10 +61,11 @@ public class SearchView extends Observable {
 	private JLabel lblEndDate;
 	private JLabel lblHowMany;
 	private JTextField textFieldHowMany;
+	private JButton btnSearch;
 	JCheckBox chckbxAdvancedOptions;
 	JPanel advancedSearchPanel;
 
-	private HotelManager hotelManager = new HotelManager();
+	private HotelManager hotelManager;
 	private ArrayList searchChoices = new ArrayList();
 	private ArrayList<Hotel> searchResults = new ArrayList();
 	private Calendar startDate;
@@ -152,17 +154,26 @@ public class SearchView extends Observable {
 		chckbxAdvancedOptions.setBounds(221, 88, 130, 25);
 		basicSearchPanel.add(chckbxAdvancedOptions);
 		
-		JButton btnSearch = new JButton("Search!");
+		btnSearch = new JButton("Search!");
 		btnSearch.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				setChanged();
 				notifyObservers();
+				/*
+				//Part of working code, commenting it out
+				//while we test DB functionality
 				gatherSelectedOptions();
 				searchChoices.clear();
 				searchChoices.add(comboEndYear.getSelectedItem());
 				
 				searchResults = hotelManager.searchHotel(searchChoices);
+				*/
+				
+				//testSearchFunction() - remove this once we're satisfied
+				//that the DB functionality works
+				testSearchFunction();
+				
 			}
 		});
 		
@@ -216,6 +227,10 @@ public class SearchView extends Observable {
 	public void addHotelManager(HotelManager hm)
 	{
 		this.hotelManager = hm;
+		/*System.out.println("We're in addHotelManager. We've copied hm to hotelManager."
+				+"The number of hotels in hm is "+hm.hotelCount()+". The number of hotels"
+				+" in this.hotelManager is "+hotelManager.hotelCount());
+				*/
 	}
 	
 	private void gatherSelectedOptions(){
@@ -228,5 +243,60 @@ public class SearchView extends Observable {
 	private int numberOfGuests;
 	private boolean[] priceRange = new boolean[5];*/
 	}
-	
+
+	private void testSearchFunction(){
+		ArrayList searchParameters = new ArrayList(16);
+		ArrayList<Hotel> searchResults;
+		LocalDate startDate = LocalDate.of(2017, 06, 02);
+		LocalDate endDate = LocalDate.of(2017, 06, 04);
+		int guests = 10;
+		
+		//Let's search for...
+		//Any hotel at all, for 10 people, on June 2-3rd.
+		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
+
+		searchParameters.add(startDate);
+		searchParameters.add(endDate);
+		searchParameters.add(guests);
+		for(int i = 3; i<16; i++)
+			searchParameters.add(null);
+		/* The ArrayList called "parameters" should be of length 16. It contains all possible search conditions:
+		 * (1) start date (type LocalDate is very much preferred; though we can handle Date with a bit of ugly conversion) 
+		 * (2) end date (also type LocalDate)
+		 * (3) number of guests (int)
+		 * (4) hotel name (String)
+		 * (5) price range (boolean[], length 5)
+		 * (6) opening months (boolean[], length 12)
+		 * (7) address (String) 
+		 * (8) ratings (boolean[], length 5)
+		 * (9) room facilities (boolean[], length 6)
+		 * (10) hotel type (boolean[], length 5)
+		 * (11) hotel facilities (boolean[], length 6)
+		 * (12) hotel area location (int[], no specific length, but all numbers should be three-digit area codes)   
+		 * (13) nearest city (String[], no specific length)
+		 * (14) nearest airport (String[], no specific length)
+		 * (15) nearest sites (String[], no specific length)
+		 * (16) nearest day tours (String[], no specific length)
+		 * */
+		
+		searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(searchParameters));
+		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
+		//System.out.println("Size of searchResults is "+searchResults.size());
+		for(Hotel h : searchResults)
+			System.out.println("Found hotel "+(String)(h.getName()));
+
+		
+		
+		/*
+		//Part of working code, commenting it out
+		//while we test DB functionality
+		gatherSelectedOptions();
+		searchChoices.clear();
+		searchChoices.add(comboEndYear.getSelectedItem());
+		
+		searchResults = hotelManager.searchHotel(searchChoices);
+		*/
+		
+	}
+
 }

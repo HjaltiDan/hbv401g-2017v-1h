@@ -21,12 +21,31 @@ public class HotelManager implements Observer {
 	private SearchView sv;
 	private ResultsView rv;
 	private ArrayList<Hotel> hotels;
-	private ArrayList<Hotel> searchedHotels;
-	private HotelStorage allHotels = new HotelStorage();
+	private ArrayList<Hotel> searchedHotels = new ArrayList<Hotel>();
+	private HotelStorage allHotels;
 	
-	public HotelManager(){
+	public HotelManager()
+	{	}
+	
+/* We needed this extra constructor because sometimes we want to create a new,
+ * temporary HotelManager without loading all the data (f.ex. in ReservationView).
+ * If we load the data every single time we initialize the constructor, we start
+ * running into trouble: The ResultSet contains double entries, some of them are
+ * null values, etc.
+ * So we call "new HotelManager(true)" if and only if we want it to load
+ * all the date from our database (basically, in the main function in
+ * ProgramManager). Anywhere else, such as in our views, we simply call
+ * "new HotelManager()" or "HotelManager m;"
+ */	
+public HotelManager(boolean initialize){
+	if(initialize){
+		allHotels = new HotelStorage();
 		loadAllHotels();
 	}
+}
+	
+	//public void initializeHotels(){
+//	}
 	
 	public void addSearchView(SearchView sv)
 	{
@@ -212,16 +231,31 @@ public class HotelManager implements Observer {
 	
 	private void loadAllHotels()
 	{
-		this.hotels = new ArrayList<Hotel>(allHotels.selectAll());
+		this.hotels = (ArrayList<Hotel>)(allHotels.selectAll());
+		//System.out.println("Went into loadAllHotels()");
+		//System.out.println("Number of loaded hotels is "+hotels.size());
 	}
 
+	public int hotelCount(){
+	return hotels.size();
+	}
+	
 	public ArrayList<Hotel> searchHotel(LocalDate startDate, LocalDate endDate, int guests)
 	{
 		searchedHotels.clear();
+		//System.out.println("Size of hotels in HotelManager is "+hotels.size());
 		for(Hotel h : hotels){
+			/*System.out.println("Hotel "+h.getName()+" has maximum "+h.checkAvailability(startDate, endDate)
+			+" free rooms between the dates "+startDate+" and "+endDate);*/
+			//System.out.println("Hotel "+h.getName()+" has maximum "+h.numberofRoomDays()+" roomDays available.");
+			//System.out.println("Availability is "+h.checkAvailability(startDate, endDate));
 			if(guests <= h.checkAvailability(startDate, endDate))
+			{
+				//System.out.println("Added hotel "+h.getName());
 				searchedHotels.add(h);
+			}
 		}
+		//System.out.println("Number of search results (searchedHotels) is "+searchedHotels.size());
 		return searchedHotels;
 	}
 	

@@ -18,7 +18,7 @@ public class ProgramManager {
 		ResultsView resultsView = new ResultsView();
 		ReservationView reservationView = new ReservationView();
 		
-		HotelManager hotelManager = new HotelManager();
+		HotelManager hotelManager = new HotelManager(true);
 		ReservationManager reservationManager = new ReservationManager();
 
 		
@@ -39,14 +39,8 @@ public class ProgramManager {
 		reservationView.addObserver(reservationManager);
 		resultsView.addObserver(hotelManager);
 		searchView.addObserver(hotelManager);
-		
-		
-		
-		UserStorage testUserStorage = new UserStorage();
-		//testUserStorage.testConnect();
-		testUserStorage.selectAll();
-	}
 
+	}
 
 	
 }
