@@ -247,19 +247,55 @@ public class SearchView extends Observable {
 	private void testSearchFunction(){
 		ArrayList searchParameters = new ArrayList(16);
 		ArrayList<Hotel> searchResults;
-		LocalDate startDate = LocalDate.of(2017, 06, 02);
-		LocalDate endDate = LocalDate.of(2017, 06, 04);
-		int guests = 10;
 		
-		//Let's search for...
-		//Any hotel at all, for 10 people, on June 2-3rd.
-		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
-
-		searchParameters.add(startDate);
-		searchParameters.add(endDate);
-		searchParameters.add(guests);
-		for(int i = 3; i<16; i++)
-			searchParameters.add(null);
+		//Our 16 parameters, in ascending order
+		/*0*/ LocalDate startDate = LocalDate.of(2017, 06, 02);
+		/*1*/ LocalDate endDate = LocalDate.of(2017, 06, 04);
+		/*2*/ int guests = 5;
+		/*3*/ String hotelName = null;
+		/*4*/ boolean[] priceRange = new boolean[5]; //Beware: Size initialization also sets all entries to FALSE
+					Arrays.fill(priceRange, true); 
+					//priceRange[3]=true; //Testing for a search on only range 4
+		/*5*/ boolean[] openingMonths = new boolean[12];
+				Arrays.fill(openingMonths, true); //Replace this line with "a[b]=true" assignments if you want to test the parameter
+		/*6*/ String hotelAddress = null;
+		/*7*/ boolean[] hotelRatings = new boolean[5];
+					Arrays.fill(hotelRatings, true);
+		/*8*/ boolean[] roomFacilities = new boolean[6];
+					Arrays.fill(roomFacilities, true);
+		/*9*/ boolean[] hotelType = new boolean[5];
+					Arrays.fill(hotelType, true);
+		/*10*/ boolean[] hotelFacilities = new boolean[6];
+					Arrays.fill(hotelFacilities, true);
+		/*11*/ int[] hotelLocation = null; //No specific array length, but all numbers should be three-digit area codes
+		/*12*/ String nearestCity = null;
+		/*13*/ String nearestAirport = "KEF";
+		/*14*/ String nearestSite = null;
+		/*15*/ String nearestDayTour = null;
+		 
+		searchParameters.add(startDate); //0
+		searchParameters.add(endDate); //1
+		searchParameters.add(guests); //2
+		searchParameters.add(hotelName); //3
+		searchParameters.add(priceRange); //4
+		searchParameters.add(openingMonths); //5
+		searchParameters.add(hotelAddress); //6
+		searchParameters.add(hotelRatings); //7
+		searchParameters.add(roomFacilities); //8
+		searchParameters.add(hotelType);	//9
+		searchParameters.add(hotelFacilities); //10
+		searchParameters.add(hotelLocation); //11
+		searchParameters.add(nearestCity); //12
+		searchParameters.add(nearestAirport); //13
+		searchParameters.add(nearestSite); //14
+		searchParameters.add(nearestDayTour); //15
+		
+		//Use this to "fill" the array if you don't add search parameters.
+		//Otherwize you'll get an error when referencing values that are unfilled,
+		//EVEN THOUGH you may have specified the array size.
+		/*for(int i = 0; i<16; i++)
+			searchParameters.add(null);*/
+		
 		/* The ArrayList called "parameters" should be of length 16. It contains all possible search conditions:
 		 * (1) start date (type LocalDate is very much preferred; though we can handle Date with a bit of ugly conversion) 
 		 * (2) end date (also type LocalDate)
@@ -278,6 +314,13 @@ public class SearchView extends Observable {
 		 * (15) nearest sites (String[], no specific length)
 		 * (16) nearest day tours (String[], no specific length)
 		 * */
+
+		
+		
+		//Let's search for...
+		//Any hotel at all, for 10 people, on June 2-3rd.
+		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
+		
 		
 		searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(searchParameters));
 		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
@@ -288,13 +331,11 @@ public class SearchView extends Observable {
 		
 		
 		/*
-		//Part of working code, commenting it out
-		//while we test DB functionality
+		//Part of working code for our own UI, commenting it out
+		//while we test code functionality for controller, model and storage layers
 		gatherSelectedOptions();
 		searchChoices.clear();
 		searchChoices.add(comboEndYear.getSelectedItem());
-		
-		searchResults = hotelManager.searchHotel(searchChoices);
 		*/
 		
 	}

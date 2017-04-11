@@ -18,8 +18,16 @@ public class Hotel {
 	private int hotelLocation;
 	private String nearestCity;
 	private String nearestAirport;
-	private ArrayList<String> nearestSites;
-	private ArrayList<String> nearbyDayTours;
+	
+	/* We're changing each of these to a single string. Doing so will simplify
+	 * our search methods and enable easier integration with other systems,
+	 * at very little cost to system functionality.
+	 */
+	//private ArrayList<String> nearestSites;
+	//private ArrayList<String> nearbyDayTours;
+
+	private String nearestSite;
+	private String nearbyDayTour;
 	
 	public Hotel(int hotelID){
 		this.hotelID = hotelID;
@@ -27,7 +35,7 @@ public class Hotel {
 	public Hotel(int hotelID, String name, boolean[] priceRange, boolean[] openingMonths, String address, 
 			ArrayList<RoomsPerDay> freeRoomsPerDate, int rating, boolean[] roomFacilities, int hotelType,
 			boolean[] hotelFacilities, int hotelLocation, String nearestCity, String nearestAirport,
-			ArrayList<String> nearestSites, ArrayList<String> nearbyDayTours)
+			String nearestSite, String nearbyDayTour)
 	{
 		this.hotelID = hotelID;
 		this.name = name;
@@ -42,8 +50,8 @@ public class Hotel {
 		this.hotelLocation = hotelLocation;
 		this.nearestCity = nearestCity;
 		this.nearestAirport = nearestAirport;
-		this.nearestSites = nearestSites;
-		this.nearbyDayTours = nearbyDayTours;
+		this.setNearestSite(nearestSite);
+		this.setNearbyDayTour(nearbyDayTour);
 	}
 	public Hotel(){}
 
@@ -229,18 +237,19 @@ public class Hotel {
 	public void setHotelLocation(int hotelLocation) {
 		this.hotelLocation = hotelLocation;
 	}
-	public ArrayList<String> getNearestSites() {
-		return nearestSites;
+	public String getNearestSite() {
+		return nearestSite;
 	}
-	public void setNearestSites(ArrayList<String> nearestSites) {
-		this.nearestSites = nearestSites;
+	public void setNearestSite(String nearestSite) {
+		this.nearestSite = nearestSite;
 	}
-	public ArrayList<String> getNearbyDayTours() {
-		return nearbyDayTours;
+	public String getNearbyDayTour() {
+		return nearbyDayTour;
 	}
-	public void setNearbyDayTours(ArrayList<String> nearbyDayTours) {
-		this.nearbyDayTours = nearbyDayTours;
+	public void setNearbyDayTour(String nearbyDayTour) {
+		this.nearbyDayTour = nearbyDayTour;
 	}
+
 	public ArrayList<RoomsPerDay> getFreeRoomsPerDate() {
 		return freeRoomsPerDate;
 	}
@@ -250,6 +259,7 @@ public class Hotel {
 		//System.out.println("freeRoomsPerDate for "+this.getName()+" now contains "+freeRoomsPerDate.size()+" elements.");
 		//this.freeRoomsPerDate = freeRoomsPerDate;
 	}
+
 	
 
 }

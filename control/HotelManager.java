@@ -79,8 +79,8 @@ public HotelManager(boolean initialize){
 	 * (10) hotel type (boolean[], length 5)
 	 * (11) hotel facilities (boolean[], length 6)
 	 * (12) hotel area location (int[], no specific length, but all numbers should be three-digit area codes)   
-	 * (13) nearest city (String[], no specific length)
-	 * (14) nearest airport (String[], no specific length)
+	 * (13) nearest city (String, no specific length)
+	 * (14) nearest airport (String, no specific length)
 	 * (15) nearest sites (String[], no specific length)
 	 * (16) nearest day tours (String[], no specific length)  
 	 * 
@@ -205,12 +205,27 @@ public HotelManager(boolean initialize){
 					match = false;
 			}
 
-			/* 
-	 * (13) nearest city (String[], no specific length)
-	 * (14) nearest airport (String[], no specific length)
-	 * (15) nearest sites (String[], no specific length)
-	 * (16) nearest day tours (String[], no specific length)   */
+			//Thirteenth parameter: nearest city
+			String searchCity = (String)parameters.get(12);
+			if( (searchCity != null) && !(searchCity.equals(h.getNearestCity())) )
+					match = false;
 
+			//Fourteenth parameter: nearest airport
+			String searchAirport = (String)parameters.get(13);
+			if( (searchAirport != null) && !(searchAirport.equals(h.getNearestAirport())) )
+					match = false;
+			
+			//Fifteenth parameter: nearest sites
+			//N.B: A hotel now has only ONE nearest site, not many
+			String searchSite = (String)(parameters.get(14));
+			if( (searchSite != null) && !(searchSite.equals(h.getNearestSite())) )
+				match = false;
+			
+			//Sixteenth parameter: nearest day tour
+			//N.B: A hotel now has only ONE nearest site, not many
+			String searchTour = (String)(parameters.get(15));
+			if( (searchTour != null) && !(searchTour.equals(h.getNearbyDayTour())) )
+				match = false;
 			
 			if(match)
 				searchedHotels.add(h);

@@ -124,13 +124,20 @@ public class HotelStorage {
 	      	
 	      	h.setNearestAirport(rsHotels.getString("nearestAirport"));
 	      	
+	      	h.setNearestSite(rsHotels.getString("nearestSites"));
+	      	
+	      	h.setNearbyDayTour(rsHotels.getString("nearbyDayTours"));
+	      	
+	      	/*
+	      	//Old code, for reference. Meant for multiple strings.
 	      	String siteList = rsHotels.getString("nearestSites");
 	      	ArrayList<String> siteArray = new ArrayList<String>(Arrays.asList(siteList.split(", ")));
 	      	h.setNearestSites(siteArray);
 	      	
 	      	String tourList = rsHotels.getString("nearbyDayTours");
 	      	ArrayList<String> tourArray = new ArrayList<String>(Arrays.asList(tourList.split(", ")));
-	      	h.setNearestSites(tourArray);
+	      	h.setNearestDayTours(tourArray);
+	      	*/
 	      	
 	      	hotels.add(h);
 	      } //while (rsRooms.next())
