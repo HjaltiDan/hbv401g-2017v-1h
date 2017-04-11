@@ -23,6 +23,7 @@ public class HotelManager implements Observer {
 	private ArrayList<Hotel> hotels;
 	private ArrayList<Hotel> searchedHotels = new ArrayList<Hotel>();
 	private HotelStorage allHotels;
+	private ReservationManager reservationManager;
 	
 	public HotelManager()
 	{	}
@@ -54,6 +55,11 @@ public HotelManager(boolean initialize){
 	public void addResultsView(ResultsView rv)
 	{
 		this.rv = rv;
+	}
+
+	public void addReservationManager(ReservationManager rm)
+	{
+		this.reservationManager = rm;
 	}
 	
 	public void update(Observable o, Object arg){

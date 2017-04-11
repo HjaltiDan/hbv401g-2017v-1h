@@ -1,16 +1,35 @@
 package model;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Reservation {
 
+
 	private int reservationID;
 	private Hotel hotel;
 	private User user;
-	private Date startDate;
-	private Date endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private int numberOfPeople;
 	private int[] numberOfRoomsByType;
 	private boolean hasBeenPaid;
+	
+	
+	public Reservation()
+	{
+		
+	}
+	
+	public Reservation(Hotel hotel, LocalDate startDate, LocalDate endDate, int numberOfGuests)
+	{
+		this.hotel = hotel;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.numberOfPeople = numberOfGuests;
+	}
+	
+	
+	
 	public int getReservationID() {
 		return reservationID;
 	}
@@ -29,16 +48,16 @@ public class Reservation {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 	public int getNumberOfPeople() {

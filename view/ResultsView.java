@@ -1,7 +1,9 @@
 package view;
 import control.*;
+import model.*;
 import java.util.Observable;
 
+import javax.swing.DefaultListModel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -34,6 +36,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,9 +56,22 @@ import javax.swing.event.ChangeEvent;
 public class ResultsView extends Observable {
 
 	private HotelManager hm;
+	private SearchView searchView;
+	private ReservationView reservationView;
+	private ArrayList<Hotel> searchResults = new ArrayList();
+	private Hotel selectedHotel;
+	private LocalDate startDate, endDate;
+	private int numberOfGuests;
 	
 	private JFrame frame;
 	private JPanel contentPane;
+	private JPanel panel;
+	private DefaultListModel model = new DefaultListModel();
+	private JList list;
+	private JLabel lblStartingDate;
+	private JLabel lblEndingDate;
+	private JLabel lblGuests;
+	private JButton btnReserveARoom;
 	
 
 
@@ -71,22 +87,96 @@ public class ResultsView extends Observable {
 		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBounds(10, 11, 583, 180);
+		panel = new JPanel();
+		panel.setBounds(10, 11, 583, 254);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNameOfHotel = new JLabel("Name of the Hotel");
-		lblNameOfHotel.setBounds(10, 11, 97, 14);
-		panel.add(lblNameOfHotel);
-		
-		JButton btnReserveARoom = new JButton("Reserve a Room");
-		btnReserveARoom.setBounds(462, 146, 111, 23);
+		btnReserveARoom = new JButton("Reserve a Room");
+		btnReserveARoom.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				int size = model.getSize();
+				int selection = list.getSelectedIndex();
+				if((size>0) && (selection>=0))
+				{
+					selectedHotel = (Hotel)searchResults.get(selection);
+					setVisible(false);
+					reservationView.receiveSelection(selectedHotel, startDate, endDate, numberOfGuests);
+					reservationView.setVisible(true);
+				}
+			}
+		});
+		btnReserveARoom.setBounds(460, 218, 111, 23);
 		panel.add(btnReserveARoom);
+		
+		lblStartingDate = new JLabel("Starting date: ");
+		lblStartingDate.setBounds(31, 10, 180, 16);
+		panel.add(lblStartingDate);
+		
+		lblEndingDate = new JLabel("Ending date:");
+		lblEndingDate.setBounds(238, 10, 180, 16);
+		panel.add(lblEndingDate);
+		
+		lblGuests = new JLabel("Guests: ");
+		lblGuests.setBounds(460, 10, 85, 16);
+		panel.add(lblGuests);
+		
+		list = new JList(model);
+		list.setBounds(31, 53, 500, 118);
+		panel.add(list);
 	}
 
 	public void addHotelManager(HotelManager hm)
 	{
 		this.hm = hm;
+	}
+	
+	public void addSearchView(SearchView sv)
+	{
+		this.searchView = sv;
+	}
+
+	public void addReservationView(ReservationView rv)
+	{
+		this.reservationView = rv;
+	}
+
+	public void setVisible(boolean state){
+		frame.setVisible(state);
+		contentPane.setVisible(state);
+		//comboStartMonth.setVisible(state);
+		//lblNewLabel.setVisible(true);
+		//lblNewLabel.setText("Show me now");
+		//comboStartDay.setVisible(state);
+		contentPane.repaint();	
+	}
+	
+	public void receiveSelection(ArrayList<Hotel> selection, LocalDate startDate, LocalDate endDate, int numberOfGuests)
+	{
+		//System.out.println("Made it to receiveSelection(), number of search results is "+selection.size());
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.numberOfGuests = numberOfGuests;
+		searchResults.clear();
+		for(Hotel h : selection)
+			searchResults.add(h);
+		lblStartingDate.setText("Starting date: "+startDate.toString());;
+		lblEndingDate.setText("Ending date: "+endDate.toString());;
+		lblGuests.setText("Guests: "+numberOfGuests);
+		
+
+		displayOptions();
+	}
+	
+	private void displayOptions()
+	{
+		int i = 0;
+		for(Hotel h : searchResults)
+		{
+			model.add(i, h.getName());
+			i++;
+		}
+		//list.repaint();
 	}
 }

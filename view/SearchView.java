@@ -66,10 +66,11 @@ public class SearchView extends Observable {
 	JPanel advancedSearchPanel;
 
 	private HotelManager hotelManager;
+	private ResultsView resultsView;
 	private ArrayList searchChoices = new ArrayList();
 	private ArrayList<Hotel> searchResults = new ArrayList();
-	private Calendar startDate;
-	private Calendar endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private int numberOfGuests;
 	private boolean[] priceRange = new boolean[5];
 	
@@ -173,6 +174,10 @@ public class SearchView extends Observable {
 				//testSearchFunction() - remove this once we're satisfied
 				//that the DB functionality works
 				testSearchFunction();
+				setVisible(false);
+				resultsView.receiveSelection(searchResults, startDate, endDate, numberOfGuests);
+				resultsView.setVisible(true);
+
 				
 			}
 		});
@@ -227,15 +232,17 @@ public class SearchView extends Observable {
 	public void addHotelManager(HotelManager hm)
 	{
 		this.hotelManager = hm;
-		/*System.out.println("We're in addHotelManager. We've copied hm to hotelManager."
-				+"The number of hotels in hm is "+hm.hotelCount()+". The number of hotels"
-				+" in this.hotelManager is "+hotelManager.hotelCount());
-				*/
+
+	}
+	
+	public void addResultsView(ResultsView rv)
+	{
+		this.resultsView = rv;
 	}
 	
 	private void gatherSelectedOptions(){
-		searchChoices.clear();
-		startDate.set(comboStartYear.getSelectedIndex(), comboStartMonth.getSelectedIndex(), comboStartDay.getSelectedIndex());
+		//searchChoices.clear();
+		//startDate.set(comboStartYear.getSelectedIndex(), comboStartMonth.getSelectedIndex(), comboStartDay.getSelectedIndex());
 		
 		//comboStartDay
 		/*private Date startDate;
@@ -246,12 +253,12 @@ public class SearchView extends Observable {
 
 	private void testSearchFunction(){
 		ArrayList searchParameters = new ArrayList(16);
-		ArrayList<Hotel> searchResults;
+
 		
 		//Our 16 parameters, in ascending order
-		/*0*/ LocalDate startDate = LocalDate.of(2017, 06, 02);
-		/*1*/ LocalDate endDate = LocalDate.of(2017, 06, 04);
-		/*2*/ int guests = 5;
+		/*0*/ startDate = LocalDate.of(2017, 06, 02);
+		/*1*/ endDate = LocalDate.of(2017, 06, 04);
+		/*2*/ numberOfGuests = 5;
 		/*3*/ String hotelName = null;
 		/*4*/ boolean[] priceRange = new boolean[5]; //Beware: Size initialization also sets all entries to FALSE
 					Arrays.fill(priceRange, true); 
@@ -269,13 +276,13 @@ public class SearchView extends Observable {
 					Arrays.fill(hotelFacilities, true);
 		/*11*/ int[] hotelLocation = null; //No specific array length, but all numbers should be three-digit area codes
 		/*12*/ String nearestCity = null;
-		/*13*/ String nearestAirport = "KEF";
+		/*13*/ String nearestAirport = null; //String nearestAirport = "KEF";
 		/*14*/ String nearestSite = null;
 		/*15*/ String nearestDayTour = null;
 		 
 		searchParameters.add(startDate); //0
 		searchParameters.add(endDate); //1
-		searchParameters.add(guests); //2
+		searchParameters.add(numberOfGuests); //2
 		searchParameters.add(hotelName); //3
 		searchParameters.add(priceRange); //4
 		searchParameters.add(openingMonths); //5
@@ -325,9 +332,10 @@ public class SearchView extends Observable {
 		searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(searchParameters));
 		//searchResults = new ArrayList<Hotel>(hotelManager.searchHotel(startDate, endDate, guests));
 		//System.out.println("Size of searchResults is "+searchResults.size());
-		for(Hotel h : searchResults)
-			System.out.println("Found hotel "+(String)(h.getName()));
+		//for(Hotel h : searchResults)
+			//System.out.println("Found hotel "+(String)(h.getName()));
 
+		
 		
 		
 		/*

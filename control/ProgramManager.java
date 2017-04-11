@@ -36,6 +36,15 @@ public class ProgramManager {
 		hotelManager.addSearchView(searchView);
 		searchView.addHotelManager(hotelManager);
 		
+		searchView.addResultsView(resultsView);
+		resultsView.addSearchView(searchView);
+		
+		resultsView.addReservationView(reservationView);
+		reservationView.addResultsView(resultsView);
+		
+		hotelManager.addReservationManager(reservationManager);
+		reservationManager.addHotelManager(hotelManager);
+		
 		reservationView.addObserver(reservationManager);
 		resultsView.addObserver(hotelManager);
 		searchView.addObserver(hotelManager);

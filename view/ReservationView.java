@@ -13,81 +13,102 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.awt.event.*;
+import javax.swing.JLabel;
 
 public class ReservationView extends Observable {
 
 	private JFrame frame;
+	private JPanel contentPane;
 	private JButton btnConfirm = new JButton();
 	int counter = 0;
 	private ReservationManager resm = new ReservationManager();
 	
-	
+	private ResultsView resultsView;	
 	private ArrayList<String> dates;
+	
+	private Hotel hotel;
+	private LocalDate startDate, endDate;
 	private int numberOfGuests;
+	
 	private String fullName;
 	private String email;
 	private int phoneNumber;
 	private String address;
+	private JLabel lblHotel;
+	private JLabel lblStartingDate;
+	private JLabel lblEndDate;
+	private JLabel lblGuests;
+	private JLabel lblReservationStatusAwaiting;
+	JButton btnConfirm_1;
 	
-	/** public void receiveSelection(chosenHotel Hotel String dates){
-	 * 
-	 * };
-	 */
+	
 
-
-	/**
-	 * Launch the application.
-	 */
-	public void start(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ReservationView window = new ReservationView();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+public ReservationView() {
+	
+	frame = new JFrame();
+	frame.setBounds(100, 100, 619, 455);
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	contentPane = new JPanel();
+	contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+	frame.setContentPane(contentPane);
+	contentPane.setLayout(null);
+	
+	JPanel panel = new JPanel();
+	panel.setBounds(10, 11, 583, 254);
+	contentPane.add(panel);
+	panel.setLayout(null);
+	
+	lblHotel = new JLabel("Hotel: ");
+	lblHotel.setBounds(12, 13, 180, 16);
+	panel.add(lblHotel);
+	
+	lblStartingDate = new JLabel("Starting date : ");
+	lblStartingDate.setBounds(12, 42, 180, 16);
+	panel.add(lblStartingDate);
+	
+	lblEndDate = new JLabel("End date: ");
+	lblEndDate.setBounds(12, 79, 180, 16);
+	panel.add(lblEndDate);
+	
+	lblGuests = new JLabel("Guests: ");
+	lblGuests.setBounds(12, 108, 180, 16);
+	panel.add(lblGuests);
+	
+	btnConfirm_1 = new JButton("Confirm");
+	btnConfirm_1.addMouseListener(new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			resm.addReservation(hotel, startDate, endDate, numberOfGuests);
+			lblReservationStatusAwaiting.setText("Reservation confirmed! Your number is: ");
+		}
+	});
+	btnConfirm_1.setBounds(12, 180, 97, 25);
+	panel.add(btnConfirm_1);
+	
+	lblReservationStatusAwaiting = new JLabel("Reservation status: Awaiting confirmation");
+	lblReservationStatusAwaiting.setBounds(180, 184, 280, 16);
+	panel.add(lblReservationStatusAwaiting);
 	}
 
-	/**
-	 * Create the application.
-	 */
-	public ReservationView() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
-		
-		btnConfirm = new JButton("Confirm");
-		
-		btnConfirm.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				System.out.println("Entered mouseClicked and event is "+arg0 );
-				setChanged();
-				//System.out.println("Notifying observers with "+btnConfirm.getText());
-				notifyObservers(btnConfirm.getText());
-				//counter++;
-				//btnConfirm.setText(Integer.toString(counter));
-			}
-		});
-		panel.add(btnConfirm);
-	}
+ public void receiveSelection(Hotel chosenHotel, LocalDate startDate, LocalDate endDate, int numberOfGuests)
+ {
+	 this.hotel = chosenHotel;
+	 this.startDate = startDate;
+	 this.endDate = endDate;
+	 this.numberOfGuests = numberOfGuests;
+	 
+	 lblHotel.setText("Hotel: "+chosenHotel.getName());
+	 lblStartingDate.setText("Starting date: "+startDate.toString());;
+	 lblEndDate.setText("Ending date: "+endDate.toString());;
+	 lblGuests.setText("Guests: "+numberOfGuests);
+ }
+ 
 
 	public void displayConfirmation(String txt){
 		//System.out.println("Got to displayConfirmation, txt var contains '"+txt+"'");
@@ -103,16 +124,22 @@ public class ReservationView extends Observable {
 		//System.out.println("View      : adding controller");
 		//btnConfirm.addActionListener((ActionListener)rm);	//need instance of controller before can add it as a listener 
 	}
-
-	public void setVisible(boolean state){
-		frame.setVisible(state);
+	
+	public void addResultsView(ResultsView v)
+	{
+		this.resultsView = v;
 	}
 	
-	/** public void addResultsView(ResultsView v){
-		this.rsv = v;
+	public void setVisible(boolean state)
+	{
+		frame.setVisible(state);
+		contentPane.setVisible(state);
+		//comboStartMonth.setVisible(state);
+		//lblNewLabel.setVisible(true);
+		//lblNewLabel.setText("Show me now");
+		//comboStartDay.setVisible(state);
+		contentPane.repaint();	
 	}
-	 * 
-	 */
 	
 	public ArrayList<String> getDates() {
 		return dates;
@@ -161,5 +188,4 @@ public class ReservationView extends Observable {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
 }
