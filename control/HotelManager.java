@@ -16,8 +16,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-public class HotelManager implements Observer {
-
+public class HotelManager implements Observer
+{
 	private SearchView sv;
 	private ResultsView rv;
 	private ArrayList<Hotel> hotels;
@@ -28,21 +28,22 @@ public class HotelManager implements Observer {
 	public HotelManager()
 	{	}
 	
-/* We needed this extra constructor because sometimes we want to create a new,
- * temporary HotelManager without loading all the data (f.ex. in ReservationView).
- * If we load the data every single time we initialize the constructor, we start
- * running into trouble: The ResultSet contains double entries, some of them are
- * null values, etc.
- * So we call "new HotelManager(true)" if and only if we want it to load
- * all the date from our database (basically, in the main function in
- * ProgramManager). Anywhere else, such as in our views, we simply call
- * "new HotelManager()" or "HotelManager m;"
- */	
-public HotelManager(boolean initialize){
-	if(initialize){
-		allHotels = new HotelStorage();
-		loadAllHotels();
-	}
+	/* Header: This HotelManager(b) constructor runs loadAllHotels() if b==true
+	 * We needed this extra constructor because sometimes we want to create a new,
+	 * temporary HotelManager without loading all the data (f.ex. in ReservationView).
+	 * If we load the data every single time we initialize the constructor, we start
+	 * running into trouble: The ResultSet contains double entries, some of them are
+	 * null values, etc.
+	 * So we call "new HotelManager(true)" if and only if we want it to load
+	 * all the date from our database (basically, in the main function in
+	 * ProgramManager). Anywhere else, such as in our views, we simply call
+	 * "new HotelManager()" or "HotelManager m;"
+	 */	
+	public HotelManager(boolean initialize){
+		if(initialize){
+			allHotels = new HotelStorage();
+			loadAllHotels();
+		}
 }
 	
 	//public void initializeHotels(){
@@ -56,7 +57,6 @@ public HotelManager(boolean initialize){
 	{
 		this.rv = rv;
 	}
-
 	public void addReservationManager(ReservationManager rm)
 	{
 		this.reservationManager = rm;
@@ -70,9 +70,9 @@ public HotelManager(boolean initialize){
 		//((ReservationView)(o)).displayConfirmation(send);
 	
 	}
-	
-	public ArrayList<Hotel> searchHotel(ArrayList parameters)
-	/* The ArrayList called "parameters" should be of length 16. It contains all possible search conditions:
+
+	/* Header: searchHotel(p) looks for all hotels matching p (which must be size & capacity 16).
+	 *	The ArrayList called "parameters" should be of length 16. It contains all possible search conditions:
 	 * (1) start date (type LocalDate is very much preferred; though we can handle Date with a bit of ugly conversion) 
 	 * (2) end date (also type LocalDate)
 	 * (3) number of guests (int)
@@ -101,9 +101,16 @@ public HotelManager(boolean initialize){
 	 * the code here - rather than having to descend into HotelStorage and perform a bunch of
 	 * horrible, liable-to-break SQL conversions there.
 	 */
+	public ArrayList<Hotel> searchHotel(ArrayList parameters)
 	{
 		boolean match = false;
 		searchedHotels.clear();
+		
+		/* First, let's make sure we got the number of parameters we need.
+		 * If not, we return an empty search array right away.*/
+		if(parameters.size() < 16)
+			return searchedHotels;
+		
 		for(Hotel h : hotels){
 			/*Let's assume this hotel is a match until we find out otherwise*/
 			match = true;
@@ -126,9 +133,8 @@ public HotelManager(boolean initialize){
 			//Fourth parameter: name
 			/* Yes, we're using "!=" in a string comparison, instead of the ".equals()" method. 
 			 * That's because we're not comparing the string to another string, but checking 
-			 * whether the string's pointer is set to null. (And if it is, calling methods 
-			 * on it would be a bad idea anyway, since that's liable to cause a NullPointerException).
-			 */
+			 * whether the string's pointer is set to null - and if it is, calling one of its
+			 * methods might cause a NullPointerException. */
 			String name = (String)parameters.get(3);
 			if( (name != null) && !(name.equals(h.getName())) )
 					match = false;
@@ -137,7 +143,7 @@ public HotelManager(boolean initialize){
 			boolean[] hotelPrices = h.getPriceRange();
 			boolean[] searchPrices = (boolean[])(parameters.get(4));
 			if (searchPrices != null)
-				/*The user chose something in this category. Remember, though, that we only have to
+				/*The user chose something in this category. Remember that we only have to
 				 * match _one_ of the criteria he chose, not all of them.*/
 				if (!findMatch(hotelPrices, searchPrices))
 					match = false;
@@ -155,14 +161,15 @@ public HotelManager(boolean initialize){
 					match = false;
 			
 			//Eight parameter: rating
-			/* Let's be a little careful here. A hotel's rating is a numerical int value. But the
+			/* Let's be a little careful here. A hotel's rating is a single int value. But the
 			 * user is allowed to search for more than one rating option. So what we get is a
 			 * boolean array of possible ratings, and we're going to match our hotel's rating
 			 * to the value in the array's corresponding _position_. For example, if our hotel
-			 * is rated 5 stars, we check whether array[4] is '1' (remember that arrays are zero-indexed).  
+			 * is rated 5 stars out of 5, we check whether array[4] is '1' (it's [4] rather than
+			 * [5] because arrays are zero-indexed).  
 			 *   
-			 * This way, we also get around the fact that int values can't be NULL; it doesn't affect
-			 * us, because boolean arrays can.
+			 * This way, we also get around the parameter complication that int values can't 
+			 * be NULL; it doesn't affect us, because boolean arrays can.
 			 */
 			boolean[] searchRatings = (boolean[])(parameters.get(7));
 			if( searchRatings != null )
@@ -259,6 +266,19 @@ public HotelManager(boolean initialize){
 
 	public int hotelCount(){
 	return hotels.size();
+	}
+
+	public void reserveRoomsForConfirmedReservation(Hotel hotel, LocalDate startDate, LocalDate endDate, int numberOfGuests)
+	/* We would make this function protected if it were only our program - it's usually called by
+	 * ReservationManager, which is in the same Control package as HotelManager, and which only calls
+	 * this function once it has made a valid reservation. But since this class need to provide
+	 * outside access, we're making the function public. */
+	{
+		for(Hotel h : hotels)
+		{
+			if(h.isEqual(hotel))
+				h.decreaseAvailability(startDate, endDate, numberOfGuests);
+		}
 	}
 	
 	public ArrayList<Hotel> searchHotel(LocalDate startDate, LocalDate endDate, int guests)

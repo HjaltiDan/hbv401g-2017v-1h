@@ -40,7 +40,7 @@ public class ReservationManager implements ActionListener, Observer {
 	
 	public int addReservation(Hotel hotel, LocalDate startDate, LocalDate endDate, int numberOfGuests)
 	{
-		int reservationID;
+		int reservationID = -1;
 		this.hotel = hotel;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -48,13 +48,10 @@ public class ReservationManager implements ActionListener, Observer {
 		
 		newReservation = new Reservation(this.hotel, this.startDate, this.endDate, this.numberOfGuests);
 		reservationID = allReservations.insert(newReservation);
-		//Create instance of Reservation. Save it with ReservationStorage.insert(), have insert()
-		//figure out its unique reservationID and either return it, or (way more work) call a.
-		//separate search function. Then take that reservationID, and return it from this function,
-		//so that we can send it up to ReervationView and display it there. 
-		//DON'T FORGET to ... if we need ... use setReservationID. Probably don't need it.
+		//Remember to call hotelmanager (or hotel itself?) function to decrease the availability for this series of dates
+		hotelManager.reserveRoomsForConfirmedReservation(hotel, startDate, endDate, numberOfGuests);
 		
-		return (reservationID);
+		return reservationID;
 	}
 	
 	

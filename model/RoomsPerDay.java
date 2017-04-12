@@ -27,22 +27,35 @@ public class RoomsPerDay {
 	  /*Comparator for sorting the list by Date*/
    public static Comparator<RoomsPerDay> RoomDaycomparator = new Comparator<RoomsPerDay>() {
 
-	public int compare(RoomsPerDay r1, RoomsPerDay r2) {
-	   LocalDate d1 = r1.getDay();
-	   LocalDate d2 = r2.getDay();
-	   int c = 0;
-	   if(d1.isBefore(d2))
-	   	c = -1;
-	   else if(d1.isAfter(d2))
-	   	c = 1;
-	   else if(d1.isEqual(d2))
-	   	c = 0;
-	   
-	   return c;
-   }};
+		public int compare(RoomsPerDay r1, RoomsPerDay r2) {
+		   LocalDate d1 = r1.getDay();
+		   LocalDate d2 = r2.getDay();
+		   int c = 0;
+		   if(d1.isBefore(d2))
+		   	c = -1;
+		   else if(d1.isAfter(d2))
+		   	c = 1;
+		   else if(d1.isEqual(d2))
+		   	c = 0;
+		   
+		   return c;
+	   }
+		
+	};
 
 	
-	
+   public void decreaseAvailableRoomsBy(int amount)
+   {
+   	if( amount >= 0 )
+   	availableRooms -= amount;
+   }
+   
+   public void increaseAvailableRoomsBy(int amount)
+   {
+   	if( amount >= 0)
+   		availableRooms += amount;
+   }
+   
 	public LocalDate getDay() {
 		return day;
 	}

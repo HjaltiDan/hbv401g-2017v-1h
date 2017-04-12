@@ -62,7 +62,7 @@ public class Hotel {
 	public int checkAvailability(LocalDate startDate, LocalDate endDate){
 		if(endDate.isBefore(startDate))
 		{
-			System.out.println("Enddate was before startdate.");
+			//Enddate was before startdate
 			return 0;
 		}		
 		long numberOfDays = ChronoUnit.DAYS.between(startDate, endDate)+1;
@@ -135,7 +135,7 @@ public class Hotel {
 		return maxPossibleRooms; //And just for good measure
 			
 		}
-					
+	
 				
 		/*
 
@@ -150,6 +150,42 @@ public class Hotel {
 
 	}
 */
+	
+
+	public boolean isEqual(Hotel hotel)
+	{
+		/*HotelID is unique, so that's the only value we need to match.*/
+		if(this.hotelID == hotel.getHotelID())
+			return true;
+		else
+			return false;
+	}
+
+	public void decreaseAvailability(LocalDate startDate, LocalDate endDate, int numberOfGuests)
+	{
+		Collections.sort(freeRoomsPerDate, RoomsPerDay.RoomDaycomparator);
+		/*Note: since we've implemented a comparator, we _could_ add extra code so that
+		 * we only cycle through the dates between start and end, similar to how it's 
+		 * done in checkAvailability(), rather than cycling through every single
+		 * freeRoomsPerDate object. Since we don't have a ton of entries, it's fine
+		 * this way, but if we ever add a bunch of new dates, we might want to
+		 * implement that extra code so that we decrease the runtime of this function.*/
+		LocalDate dayBeforeStart = startDate.minusDays(1);
+		LocalDate dayAfterEnd = endDate.plusDays(1);
+		for(RoomsPerDay e : freeRoomsPerDate)
+		{
+			LocalDate checkingDay = e.getDay();
+			if( (checkingDay.isAfter(dayBeforeStart)) && (checkingDay.isBefore(dayAfterEnd)) )
+				e.decreaseAvailableRoomsBy(numberOfGuests);
+		}
+	}
+	
+	public void decreaseAvailability(LocalDate thisDate, int numberOfGuests)
+	{
+		//UNIMPLEMENTED. Including it mainly because it was part of the original design
+	}
+	
+	
 	private RoomsPerDay findRoomDay(LocalDate date){
 		//System.out.println("In findRoomDay(). Date is "+date.toString()+" .Size of freeRoomsPerDate is "+freeRoomsPerDate.size());
 		//System.out.println("In findRoomDay(). Variable date is "+date);

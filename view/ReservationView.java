@@ -35,6 +35,7 @@ public class ReservationView extends Observable {
 	private Hotel hotel;
 	private LocalDate startDate, endDate;
 	private int numberOfGuests;
+	private int reservationID = -1;
 	
 	private String fullName;
 	private String email;
@@ -84,15 +85,18 @@ public ReservationView() {
 	btnConfirm_1.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			resm.addReservation(hotel, startDate, endDate, numberOfGuests);
-			lblReservationStatusAwaiting.setText("Reservation confirmed! Your number is: ");
+			reservationID = resm.addReservation(hotel, startDate, endDate, numberOfGuests);
+			if( reservationID >= 0 )
+				lblReservationStatusAwaiting.setText("Reservation confirmed! Your reservation number is: "+reservationID);
+			else
+				lblReservationStatusAwaiting.setText("Reservation failed! Attempts returned errorcode "+reservationID);
 		}
 	});
 	btnConfirm_1.setBounds(12, 180, 97, 25);
 	panel.add(btnConfirm_1);
 	
 	lblReservationStatusAwaiting = new JLabel("Reservation status: Awaiting confirmation");
-	lblReservationStatusAwaiting.setBounds(180, 184, 280, 16);
+	lblReservationStatusAwaiting.setBounds(180, 184, 350, 16);
 	panel.add(lblReservationStatusAwaiting);
 	}
 
