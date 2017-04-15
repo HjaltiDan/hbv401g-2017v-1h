@@ -4,11 +4,7 @@ import storage.*;
 import view.*;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-import java.awt.event.*;
 
 public class ProgramManager {
 
@@ -21,11 +17,8 @@ public class ProgramManager {
 		HotelManager hotelManager = new HotelManager(true);
 		ReservationManager reservationManager = new ReservationManager();
 
-		
-		
 		reservationView.setVisible(false);
 		searchView.setVisible(true);
-		
 		
 		reservationManager.addReservationView(reservationView);
 		reservationView.addReservationManager(reservationManager);
@@ -45,9 +38,6 @@ public class ProgramManager {
 		hotelManager.addReservationManager(reservationManager);
 		reservationManager.addHotelManager(hotelManager);
 		
-		reservationView.addObserver(reservationManager);
-		resultsView.addObserver(hotelManager);
-		searchView.addObserver(hotelManager);
 
 	}
 

@@ -53,7 +53,7 @@ public class ReservationView extends Observable {
 public ReservationView() {
 	
 	frame = new JFrame();
-	frame.setBounds(100, 100, 619, 455);
+	frame.setBounds(100, 100, 748, 540);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	contentPane = new JPanel();
 	contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -61,7 +61,7 @@ public ReservationView() {
 	contentPane.setLayout(null);
 	
 	JPanel panel = new JPanel();
-	panel.setBounds(10, 11, 583, 254);
+	panel.setBounds(10, 11, 674, 221);
 	contentPane.add(panel);
 	panel.setLayout(null);
 	
@@ -115,18 +115,11 @@ public ReservationView() {
  
 
 	public void displayConfirmation(String txt){
-		//System.out.println("Got to displayConfirmation, txt var contains '"+txt+"'");
-		//String currBtnText = btnConfirm.getText();
-		//System.out.println("Current button text is "+currBtnText);
 		btnConfirm.setText(txt);
 	}
 	
 	public void addReservationManager(ReservationManager rm){
 		resm = rm;
-		
-		//System.out.println(rm.writeTempint());
-		//System.out.println("View      : adding controller");
-		//btnConfirm.addActionListener((ActionListener)rm);	//need instance of controller before can add it as a listener 
 	}
 	
 	public void addResultsView(ResultsView v)
@@ -138,10 +131,6 @@ public ReservationView() {
 	{
 		frame.setVisible(state);
 		contentPane.setVisible(state);
-		//comboStartMonth.setVisible(state);
-		//lblNewLabel.setVisible(true);
-		//lblNewLabel.setText("Show me now");
-		//comboStartDay.setVisible(state);
 		contentPane.repaint();	
 	}
 	

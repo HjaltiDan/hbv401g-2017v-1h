@@ -1,6 +1,7 @@
 package model;
 
 public class User {
+	private int userID;
 	private int authorizationLevel;
 	private String username;
 	private String password;
@@ -133,8 +134,19 @@ public class User {
 		return cardExpiryDate;
 	}
 
-	public void setCardExpiryDate(int[] cardExpiryDate) {
+	public void setCardExpiryDate(int[] cardExpiryDate)
+	{
+		//int[mm,yy]
 		this.cardExpiryDate = cardExpiryDate;
+	}
+	
+
+	public int getUserID() {
+		return userID;
+	}
+
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 	
 	

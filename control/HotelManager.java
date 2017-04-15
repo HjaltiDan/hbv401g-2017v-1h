@@ -3,25 +3,17 @@ import model.*;
 
 import storage.*;
 import view.*;
-import view.ReservationView;
-
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.*;
-import java.awt.event.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
-public class HotelManager implements Observer
+public class HotelManager //implements Observer
 {
+	@SuppressWarnings("unused")
 	private SearchView sv;
+	@SuppressWarnings("unused")
 	private ResultsView rv;
 	private ArrayList<Hotel> hotels;
 	private ArrayList<Hotel> searchedHotels = new ArrayList<Hotel>();
+	private ArrayList<Integer> rpdIDs = new ArrayList<Integer>();
 	private HotelStorage allHotels;
 	private ReservationManager reservationManager;
 	
@@ -46,9 +38,7 @@ public class HotelManager implements Observer
 		}
 }
 	
-	//public void initializeHotels(){
-//	}
-	
+
 	public void addSearchView(SearchView sv)
 	{
 		this.sv = sv;
@@ -62,33 +52,32 @@ public class HotelManager implements Observer
 		this.reservationManager = rm;
 	}
 	
-	public void update(Observable o, Object arg){
-		
-		//if(o instanceof ReservationView)
-			//System.out.println("Caught ReservationView");
-	
-		//((ReservationView)(o)).displayConfirmation(send);
-	
+	private void toBool(ArrayList o, boolean[] b)
+	{
+		for(int i = 0; i<o.size(); i++)
+			b[i] = Boolean.valueOf((o.get(i)).toString());
 	}
+	
+
 
 	/* Header: searchHotel(p) looks for all hotels matching p (which must be size & capacity 16).
 	 *	The ArrayList called "parameters" should be of length 16. It contains all possible search conditions:
-	 * (1) start date (type LocalDate is very much preferred; though we can handle Date with a bit of ugly conversion) 
-	 * (2) end date (also type LocalDate)
-	 * (3) number of guests (int)
-	 * (4) hotel name (String)
-	 * (5) price range (boolean[], length 5)
-	 * (6) opening months (boolean[], length 12)
-	 * (7) address (String) 
-	 * (8) ratings (boolean[], length 5)
-	 * (9) room facilities (boolean[], length 6)
-	 * (10) hotel type (boolean[], length 5)
-	 * (11) hotel facilities (boolean[], length 6)
-	 * (12) hotel area location (int[], no specific length, but all numbers should be three-digit area codes)   
-	 * (13) nearest city (String, no specific length)
-	 * (14) nearest airport (String, no specific length)
-	 * (15) nearest sites (String[], no specific length)
-	 * (16) nearest day tours (String[], no specific length)  
+	 * (0) start date (LocalDate) 
+	 * (1) end date (LocalDate)
+	 * (2) number of guests (int)
+	 * (3) hotel name (String)
+	 * (4) price range (boolean[], length 5)
+	 * (5) opening months (boolean[], length 12)
+	 * (6) address (String) 
+	 * (7) ratings (boolean[], length 5)
+	 * (8) room facilities (boolean[], length 6)
+	 * (9) hotel type (boolean[], length 5)
+	 * (10) hotel facilities (boolean[], length 6)
+	 * (11) hotel area location (boolean[], length 6 - is eventually matched to a hotel's 3-digit int postal code)   
+	 * (12) nearest city (boolean[], length 5)
+	 * (13) nearest airport (boolean[], length 6)
+	 * (14) nearest sites (boolean[], length 8)
+	 * (15) nearest day tours (boolean[], length 6) 
 	 * 
 	 * If a search condition was not specified by the user (meaning the user doesn't care about
 	 * that particular condition - location, pricing, rating, etc.) then its corresponding position
@@ -120,7 +109,7 @@ public class HotelManager implements Observer
 			 * but that kind of code is really cryptic. So let's use temporary variables
 			 * instead, for each of the parameters.*/
 
-			//First, second and third parameters:
+			//Parameters 0, 1 and 2
 			//startDate, endDate, and number of guests
 			LocalDate startDate = (LocalDate)parameters.get(0);
 			LocalDate endDate = (LocalDate)parameters.get(1);
@@ -129,35 +118,33 @@ public class HotelManager implements Observer
 				match = false;
 			if(numberOfGuests > h.checkAvailability(startDate, endDate))
 				match = false;
-			
-			//Fourth parameter: name
+
+			//Parameter 3: name
 			/* Yes, we're using "!=" in a string comparison, instead of the ".equals()" method. 
-			 * That's because we're not comparing the string to another string, but checking 
-			 * whether the string's pointer is set to null - and if it is, calling one of its
-			 * methods might cause a NullPointerException. */
+			 * That's because we're first checking whether the string's _pointer_ is set to null,
+			 * because if so, the second condition of our "if" clause - the one that might be
+			 * calling a method on an object set to null - could cause a NullPointerException. 
+			 */
 			String name = (String)parameters.get(3);
 			if( (name != null) && !(name.equals(h.getName())) )
 					match = false;
 			
-			//Fifth parameter: pricing options
+			//Parameter 4: pricing options
 			boolean[] hotelPrices = h.getPriceRange();
 			boolean[] searchPrices = (boolean[])(parameters.get(4));
-			if (searchPrices != null)
-				/*The user chose something in this category. Remember that we only have to
-				 * match _one_ of the criteria he chose, not all of them.*/
-				if (!findMatch(hotelPrices, searchPrices))
-					match = false;
-			
-			//Sixth parameter: opening months
+			if (!findMatch(hotelPrices, searchPrices))
+				match = false;
+						
+			//Parameter 5: opening months
 			boolean[] hotelOpeningMonths = h.getOpeningMonths();
 			boolean[] searchOpeningMonths = (boolean[])(parameters.get(5));
-			if (searchOpeningMonths != null)
-				if (!findMatch(hotelOpeningMonths, searchOpeningMonths))
-					match = false;
+			//if ((searchOpeningMonths != null) && (Arrays.asList(hotelOpeningMonths).contains(true)))
+			if (!findMatch(hotelOpeningMonths, searchOpeningMonths))
+				match = false;
 			
-			//Seventh parameter: address
+			//Parameter 6: address
 			String address = (String)parameters.get(6);
-			if( (address != null) && !(address.equals(h.getName())) )
+			if( (address != null) && (!address.equals("")) && (!address.equals(h.getAddress())) )
 					match = false;
 			
 			//Eight parameter: rating
@@ -171,97 +158,231 @@ public class HotelManager implements Observer
 			 * This way, we also get around the parameter complication that int values can't 
 			 * be NULL; it doesn't affect us, because boolean arrays can.
 			 */
+			boolean[] hotelRatings = new boolean[5];
+			hotelRatings[h.getRating()-1] = true;
 			boolean[] searchRatings = (boolean[])(parameters.get(7));
-			if( searchRatings != null )
-			{
-				int hotelRating = h.getRating();
-				if( !(searchRatings[hotelRating-1]) )
-					match = false;
-			}
+			if (!findMatch(hotelRatings, searchRatings))
+				match = false;
 			
 			//Ninth parameter: room facilities
 			boolean[] hotelRoomFacilities = h.getRoomFacilities();
 			boolean[] searchRoomFacilities = (boolean[])(parameters.get(8));
-			if (searchRoomFacilities != null)
-				if (!findMatch(hotelRoomFacilities, searchRoomFacilities))
+			if (!findMatch(hotelRoomFacilities, searchRoomFacilities))
 					match = false;
 			
 			//Tenth parameter: hotel type
-			//Handled same way as ratings
+			boolean[] hotelTypes = new boolean[5];
+			hotelTypes[h.getHotelType()-1] = true;
 			boolean[] searchTypes = (boolean[])(parameters.get(9));
-			if( searchTypes!= null )
-			{
-				int hotelType = h.getHotelType();
-				if( !(searchTypes[hotelType-1]) )
-					match = false;
-			}
+			if(!findMatch(hotelTypes, searchTypes))
+				match = false;
 		
 			//Eleventh parameter: hotel facilities
 			boolean[] hotelFacilities = h.getHotelFacilities();
 			boolean[] searchFacilities = (boolean[])(parameters.get(10));
-			if (searchFacilities != null)
-				if (!findMatch(hotelFacilities, searchFacilities))
-					match = false;
-	
+			if (!findMatch(hotelFacilities, searchFacilities))
+				match = false;
 			
 			//Twelth parameter: hotel area location
 			int hotelLocation = h.getHotelLocation();
-			int[] searchLocations = (int[])(parameters.get(11));
-			if( searchLocations != null){
+			boolean[] searchLocations = (boolean[])(parameters.get(11));
+			if(!allZeroes(searchLocations))
+			{
 				boolean foundLocation = false;
-				for(int i : searchLocations)
-				{
-					if(i == hotelLocation)
-						foundLocation = true;
-				}
+				
+				/* This is a little cryptic, but it means we could later create
+				 * a far more granular search for individual postal codes.
+				 * A hotel's location is an int representing a postal code. 
+				 * Our search, however, only covers binary selections of
+				 * particular regions. So we use official region divisions 
+				 * from the Icelandic Postal Authority to check if this 
+				 * particular hotel's postal code falls within the range 
+				 * of at least one of the user's selections.
+				 * 
+				 * Also, it would be wonderful if a switch statement could be
+				 * made to work with more than one condition.
+				 */
+
+				if( (searchLocations[0]) && (hotelLocation>=101) && (hotelLocation<=276) )
+					foundLocation=true;
+				
+				else if( (searchLocations[1]) && (800<=hotelLocation) && (hotelLocation<=902))
+					foundLocation=true;
+			
+				else if( (searchLocations[2]) && (700<=hotelLocation) && (hotelLocation<=785))
+					foundLocation=true;
+			
+				else if( (searchLocations[3]) && (500<=hotelLocation) && (hotelLocation<=690))
+					foundLocation=true;
+			
+				else if( (searchLocations[4]) && (300<=hotelLocation) && (hotelLocation<=380))
+					foundLocation=true;
+			
+				else if( (searchLocations[5]) && (400<=hotelLocation) && (hotelLocation<=471))
+					foundLocation=true;
+			
 				if(!foundLocation)
 					match = false;
 			}
-
+			
+			
 			//Thirteenth parameter: nearest city
-			String searchCity = (String)parameters.get(12);
-			if( (searchCity != null) && !(searchCity.equals(h.getNearestCity())) )
+			String hotelCity = h.getNearestCity();
+			boolean[] cityLocations = (boolean[])(parameters.get(12));
+			if(!allZeroes(cityLocations))
+			{
+				boolean foundCity = false;
+				if( (cityLocations[0]) && (hotelCity.equals("Reykjavík")) )
+					foundCity=true;
+				
+				if( (cityLocations[1]) && (hotelCity.equals("Keflavík")) )
+					foundCity=true;
+			
+				if( (cityLocations[2]) && (hotelCity.equals("Akureyri")) )
+					foundCity=true;
+			
+				if( (cityLocations[3]) && (hotelCity.equals("Egilsstaðir")) )
+					foundCity=true;
+			
+				if( (cityLocations[4]) && (hotelCity.equals("Ísafjörður")) )
+					foundCity=true;
+			
+				if(!foundCity)
 					match = false;
-
+			}	
+			
 			//Fourteenth parameter: nearest airport
-			String searchAirport = (String)parameters.get(13);
-			if( (searchAirport != null) && !(searchAirport.equals(h.getNearestAirport())) )
+			String hotelAirport = h.getNearestAirport();
+			boolean[] airportLocations = (boolean[])(parameters.get(13));
+			if(!allZeroes(airportLocations))
+			{
+				boolean foundAirport = false;
+				
+				if( (airportLocations[0]==true) && (hotelAirport.equals("KEF")) )
+					foundAirport=true;
+			
+				if( (airportLocations[1]==true) && (hotelAirport.equals("RKV")) )
+					foundAirport=true;
+			
+				if( (airportLocations[2]==true) && (hotelAirport.equals("AEY")) )
+					foundAirport=true;
+			
+				if( (airportLocations[3]==true) && (hotelAirport.equals("EGS")) )
+					foundAirport=true;
+			
+				if( (airportLocations[4]==true) && (hotelAirport.equals("IFJ")) )
+					foundAirport=true;
+			
+				if(!foundAirport)
 					match = false;
 			
-			//Fifteenth parameter: nearest sites
-			//N.B: A hotel now has only ONE nearest site, not many
-			String searchSite = (String)(parameters.get(14));
-			if( (searchSite != null) && !(searchSite.equals(h.getNearestSite())) )
-				match = false;
+			}	
 			
+			//Fifteenth parameter: nearest site of interest
+			String hotelSite = h.getNearestSite();
+			boolean[] siteLocations = (boolean[])(parameters.get(14));
+			if(!allZeroes(siteLocations))
+			{
+				boolean foundSite = false;
+
+				if( (siteLocations[0]==true) && (hotelSite.equals("Gullfoss")) )
+					foundSite=true;
+				
+				if( (siteLocations[1]==true) && (hotelSite.equals("Geysir")) )
+					foundSite=true;
+				
+				if( (siteLocations[2]==true) && (hotelSite.equals("Blue Lagoon")) )
+					foundSite=true;
+				
+				if( (siteLocations[3]==true) && (hotelSite.equals("Þingvellir")) )
+					foundSite=true;
+				
+				if( (siteLocations[4]==true) && (hotelSite.equals("Jökulsárlón")) )
+					foundSite=true;
+				
+				if( (siteLocations[5]==true) && (hotelSite.equals("Dettifoss")) )
+					foundSite=true;
+				
+				if( (siteLocations[6]==true) && (hotelSite.equals("Vatnajökull")) )
+					foundSite=true;
+				
+				if( (siteLocations[7]==true) && (hotelSite.equals("Jólahúsið")) )
+					foundSite=true;
+				
+				if(!foundSite)
+					match = false;
+			
+			}	
+			
+	
 			//Sixteenth parameter: nearest day tour
-			//N.B: A hotel now has only ONE nearest site, not many
-			String searchTour = (String)(parameters.get(15));
-			if( (searchTour != null) && !(searchTour.equals(h.getNearbyDayTour())) )
-				match = false;
+			String tour = h.getNearbyDayTour();
+			boolean[] tourLocations = (boolean[])(parameters.get(15));
+			if(!allZeroes(tourLocations))
+			{
+				boolean foundTour = false;
+				
+				if( (tourLocations[0]==true) && (tour.equals("Hestaferð")) )
+					foundTour=true;
+				
+				if( (tourLocations[1]==true) && (tour.equals("Söguganga")) )
+					foundTour=true;
+				
+				if( (tourLocations[2]==true) && (tour.equals("Fjallganga")) )
+					foundTour=true;
+				
+				if( (tourLocations[3]==true) && (tour.equals("Skíðaferð")) )
+					foundTour=true;
+				
+				if( (tourLocations[4]==true) && (tour.equals("Þingvallahringur")) )
+					foundTour=true;
+				
+				if( (tourLocations[5]==true) && (tour.equals("Reiðhjólatúr")) )
+					foundTour=true;
+				
+				if(!foundTour)
+					match = false;
+			
+			}	
 			
 			if(match)
 				searchedHotels.add(h);
 		}
+		
 		return searchedHotels;
 	}
 
-	private boolean findMatch(boolean[] a, boolean[] b)
+	private boolean findMatch(boolean[] hotel, boolean[] searchCriteria)
 	{
+		boolean allZeroes = true;
 		boolean foundMatch = false;
-		for(int i=0; i<a.length; i++)
+		for(int i=0; i<hotel.length; i++)
 		{
-   		if( a[i] && b[i] )
+			if(searchCriteria[i]) //Since this tests for true, it takes care of arrays that either are all false or all null
+				allZeroes = false;
+   		if( hotel[i] && searchCriteria[i] )
    			foundMatch = true;
 		}
-   return foundMatch;
+		if(allZeroes)
+			return allZeroes;
+		else
+			return foundMatch;
+	}
+	
+	private boolean allZeroes(boolean[] searchCriteria)
+	{
+		boolean empty = true;
+		for(boolean b : searchCriteria)
+		{
+			if(b)
+				empty = false;
+		}
+		return empty;
 	}
 	
 	private void loadAllHotels()
 	{
 		this.hotels = (ArrayList<Hotel>)(allHotels.selectAll());
-		//System.out.println("Went into loadAllHotels()");
-		//System.out.println("Number of loaded hotels is "+hotels.size());
 	}
 
 	public int hotelCount(){
@@ -274,34 +395,31 @@ public class HotelManager implements Observer
 	 * this function once it has made a valid reservation. But since this class need to provide
 	 * outside access, we're making the function public. */
 	{
+		rpdIDs.clear();
 		for(Hotel h : hotels)
 		{
-			if(h.isEqual(hotel))
-				h.decreaseAvailability(startDate, endDate, numberOfGuests);
+			if(h.isEqual(hotel)) //This will just be one hotel
+			{
+				ArrayList<Integer> tempRooms = h.decreaseAvailability(startDate, endDate, numberOfGuests);
+				allHotels.updateRoomAvailability(h, tempRooms, numberOfGuests);
+			}
 		}
 	}
 	
 	public ArrayList<Hotel> searchHotel(LocalDate startDate, LocalDate endDate, int guests)
 	{
 		searchedHotels.clear();
-		//System.out.println("Size of hotels in HotelManager is "+hotels.size());
 		for(Hotel h : hotels){
-			/*System.out.println("Hotel "+h.getName()+" has maximum "+h.checkAvailability(startDate, endDate)
-			+" free rooms between the dates "+startDate+" and "+endDate);*/
-			//System.out.println("Hotel "+h.getName()+" has maximum "+h.numberofRoomDays()+" roomDays available.");
-			//System.out.println("Availability is "+h.checkAvailability(startDate, endDate));
 			if(guests <= h.checkAvailability(startDate, endDate))
 			{
-				//System.out.println("Added hotel "+h.getName());
 				searchedHotels.add(h);
 			}
 		}
-		//System.out.println("Number of search results (searchedHotels) is "+searchedHotels.size());
 		return searchedHotels;
 	}
 	
 	
-//This is a searchHotel method that takes in Date objects, not LocalDate
+//Below is a searchHotel method that takes in Date objects, not LocalDate
 //Shown for reference in case we need to implement the Date->Localdate
 //conversion again, for example if anyone outside 1H needs it
 /*

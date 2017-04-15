@@ -1,21 +1,16 @@
 package storage;
 import model.*;
-import control.*;
-
-import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 
 
 public class ReservationStorage {
 
 	private Reservation res;
 	private Hotel hotel;
-	private User user;
 	
 	private Connection connect() 
 	{
@@ -35,7 +30,6 @@ public class ReservationStorage {
 	
 	public int insert(Reservation r)
 	{
-		//int returnID = 0;
 		long returnedID = 0;
 		this.res = r;
 		this.hotel = r.getHotel();

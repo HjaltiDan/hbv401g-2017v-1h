@@ -1,20 +1,18 @@
 package model;
-//import java.util.ArrayList; //For ArrayList, if we need it
+
 import java.time.*;
 import java.util.Comparator;
 
 public class RoomsPerDay {
+	private int rpdID;
 	private LocalDate day;
 	private int availableRooms;
-	//	private ArrayList<int> availableRoomsByType;
 
 	public RoomsPerDay(){
 		this.availableRooms = 0;
 	}
 	
 	public RoomsPerDay(RoomsPerDay rpd){
-//		if(rpd == null)
-	//		System.exit(0);
 		this.day = rpd.getDay();
 		this.availableRooms = rpd.getAllAvailableRooms();
 	}
@@ -23,6 +21,13 @@ public class RoomsPerDay {
 		this.day = day;
 		this.availableRooms = availableRooms;
 	}
+
+	public RoomsPerDay(int ID, LocalDate day, int availableRooms){
+		this.rpdID = ID;
+		this.day = day;
+		this.availableRooms = availableRooms;
+	}
+	
 	
 	  /*Comparator for sorting the list by Date*/
    public static Comparator<RoomsPerDay> RoomDaycomparator = new Comparator<RoomsPerDay>() {
@@ -75,5 +80,13 @@ public class RoomsPerDay {
 	public void setAvailableRooms(int roomType, int number){
 		//Ignoring roomType for now
 		this.availableRooms = number;
+	}
+
+	public int getRpdID() {
+		return rpdID;
+	}
+
+	public void setRpdID(int rpdID) {
+		this.rpdID = rpdID;
 	}
 }

@@ -15,9 +15,11 @@ public class UserManager {
 		this.currentUser = new User(currentUser);
 	}
 	
-	private void loadAllUsers(){
-		/*Unfinished*/
+	private void loadAllUsers()
+	{
+		this.users = (ArrayList<User>)(allUsers.selectAll());
 	}
+	
 	
 	
 }

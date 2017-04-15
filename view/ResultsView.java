@@ -38,16 +38,7 @@ import java.awt.event.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.Calendar;
 import java.util.Date;
-import com.toedter.calendar.JCalendar;
-import com.toedter.calendar.JDateChooser;
-import com.toedter.calendar.JDayChooser;
-import com.toedter.calendar.JMonthChooser;
-import com.toedter.calendar.JYearChooser;
-import com.toedter.components.JLocaleChooser;
-import com.toedter.components.JSpinField;
-import com.toedter.components.JTitlePanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -125,6 +116,16 @@ public class ResultsView extends Observable {
 		list = new JList(model);
 		list.setBounds(31, 53, 500, 118);
 		panel.add(list);
+		
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				searchView.setVisible(true);
+			}
+		});
+		btnBack.setBounds(10, 218, 89, 23);
+		panel.add(btnBack);
 	}
 
 	public void addHotelManager(HotelManager hm)
@@ -145,16 +146,11 @@ public class ResultsView extends Observable {
 	public void setVisible(boolean state){
 		frame.setVisible(state);
 		contentPane.setVisible(state);
-		//comboStartMonth.setVisible(state);
-		//lblNewLabel.setVisible(true);
-		//lblNewLabel.setText("Show me now");
-		//comboStartDay.setVisible(state);
 		contentPane.repaint();	
 	}
 	
 	public void receiveSelection(ArrayList<Hotel> selection, LocalDate startDate, LocalDate endDate, int numberOfGuests)
 	{
-		//System.out.println("Made it to receiveSelection(), number of search results is "+selection.size());
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.numberOfGuests = numberOfGuests;
@@ -164,19 +160,19 @@ public class ResultsView extends Observable {
 		lblStartingDate.setText("Starting date: "+startDate.toString());;
 		lblEndingDate.setText("Ending date: "+endDate.toString());;
 		lblGuests.setText("Guests: "+numberOfGuests);
-		
 
 		displayOptions();
 	}
 	
 	private void displayOptions()
 	{
+		model.clear();
 		int i = 0;
 		for(Hotel h : searchResults)
 		{
 			model.add(i, h.getName());
 			i++;
 		}
-		//list.repaint();
+
 	}
 }

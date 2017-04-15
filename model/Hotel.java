@@ -1,5 +1,4 @@
 package model;
-import control.*;
 import java.util.*;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +10,7 @@ public class Hotel {
 	private boolean[] openingMonths;
 	private String address;
 	private ArrayList<RoomsPerDay> freeRoomsPerDate = new ArrayList<RoomsPerDay>();
+	private ArrayList<Integer> roomIDs = new ArrayList<Integer>();
 	private int rating;
 	private boolean[] roomFacilities;
 	private int hotelType;
@@ -18,20 +18,13 @@ public class Hotel {
 	private int hotelLocation;
 	private String nearestCity;
 	private String nearestAirport;
-	
-	/* We're changing each of these to a single string. Doing so will simplify
-	 * our search methods and enable easier integration with other systems,
-	 * at very little cost to system functionality.
-	 */
-	//private ArrayList<String> nearestSites;
-	//private ArrayList<String> nearbyDayTours;
-
 	private String nearestSite;
 	private String nearbyDayTour;
 	
 	public Hotel(int hotelID){
 		this.hotelID = hotelID;
 	}
+	
 	public Hotel(int hotelID, String name, boolean[] priceRange, boolean[] openingMonths, String address, 
 			ArrayList<RoomsPerDay> freeRoomsPerDate, int rating, boolean[] roomFacilities, int hotelType,
 			boolean[] hotelFacilities, int hotelLocation, String nearestCity, String nearestAirport,
@@ -66,8 +59,6 @@ public class Hotel {
 			return 0;
 		}		
 		long numberOfDays = ChronoUnit.DAYS.between(startDate, endDate)+1;
-		//System.out.println("Duration of stay is "+duration);
-		LocalDate day = startDate;
 		int maxPossibleRooms = 0;
 		int currentPossibleRooms = 0;
 		boolean foundFirstDay = false;
@@ -116,8 +107,6 @@ public class Hotel {
 				if( currentPossibleRooms<maxPossibleRooms )
 					maxPossibleRooms = currentPossibleRooms;
 			}
-			
-			
 			if( (thatDay.isAfter(endDate)) )
 				/* (We don't need this condition here, by the way, but it'll save us having to
 				 * cyce through every single remaining entry in freeRoomsPerDate)
@@ -134,22 +123,7 @@ public class Hotel {
 		}
 		return maxPossibleRooms; //And just for good measure
 			
-		}
-	
-				
-		/*
-
-		RoomsPerDay dailyRoom = new RoomsPerDay();
-		if (findRoomDay(startDate) == null)
-		{
-			//System.out.println("Hotel "+this.getName()+" has no room for that date.");
-			return 0;
-		}
-		dailyRoom = findRoomDay(startDate);
-		maxPossibleRooms = dailyRoom.getAllAvailableRooms();
-
 	}
-*/
 	
 
 	public boolean isEqual(Hotel hotel)
@@ -161,8 +135,9 @@ public class Hotel {
 			return false;
 	}
 
-	public void decreaseAvailability(LocalDate startDate, LocalDate endDate, int numberOfGuests)
+	public ArrayList<Integer> decreaseAvailability(LocalDate startDate, LocalDate endDate, int numberOfGuests)
 	{
+		roomIDs.clear();		
 		Collections.sort(freeRoomsPerDate, RoomsPerDay.RoomDaycomparator);
 		/*Note: since we've implemented a comparator, we _could_ add extra code so that
 		 * we only cycle through the dates between start and end, similar to how it's 
@@ -176,8 +151,13 @@ public class Hotel {
 		{
 			LocalDate checkingDay = e.getDay();
 			if( (checkingDay.isAfter(dayBeforeStart)) && (checkingDay.isBefore(dayAfterEnd)) )
+			{
 				e.decreaseAvailableRoomsBy(numberOfGuests);
+				roomIDs.add(e.getRpdID());
+			}
 		}
+		
+		return roomIDs; //We return these to the Control layer so it can update the corresponding DB entries
 	}
 	
 	public void decreaseAvailability(LocalDate thisDate, int numberOfGuests)
@@ -187,12 +167,8 @@ public class Hotel {
 	
 	
 	private RoomsPerDay findRoomDay(LocalDate date){
-		//System.out.println("In findRoomDay(). Date is "+date.toString()+" .Size of freeRoomsPerDate is "+freeRoomsPerDate.size());
-		//System.out.println("In findRoomDay(). Variable date is "+date);
-		//System.out.println("Size of freeRoomsPerDate for hotel "+this.getName()+" is "+freeRoomsPerDate.size());
 		for(RoomsPerDay e : freeRoomsPerDate)
 		{
-			//Check this condition
 			System.out.println("e.getDay(): "+e.getDay());
 			System.out.println("LocalDate date: "+date);
 			if(e.getDay() == date)

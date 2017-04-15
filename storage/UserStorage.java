@@ -1,8 +1,19 @@
 package storage;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import model.*;
+
 
 public class UserStorage
 {
+	private ArrayList<User> users;
+	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd");
+	private LocalDate creditCardExpiry;
+	private int[] mmyy = new int[2];
+	
+	
 	private Connection connect() 
 	{
 		String url = "jdbc:sqlite:lib/1H.db";
@@ -18,39 +29,57 @@ public class UserStorage
 		return conn;
 	}
 	
-	public void selectAll()
+	public ArrayList<User> selectAll()
 	{
-		String sql = "SELECT userID, authorizationLevel, username, password, fullName, address, phoneNumber, "
-        		   + "email, hasSavedCard, cardNumber, cardHolderName, cardCVC, cardExpiryDate FROM Users";
+		users.clear();
+		
+		String sqlAllUsers = "SELECT * FROM Users";
 		try 
 		(Connection conn = this.connect();
-		Statement stmt = conn.createStatement(); 
-		ResultSet rs = stmt.executeQuery(sql);)
+		Statement stmtUsers = conn.createStatement(); 
+		ResultSet rsUsers = stmtUsers.executeQuery(sqlAllUsers);)
 		{
-			// loop through the result set
-	      while (rs.next())
-	      {
-/*	      	System.out.println(rs.getInt("userID") + "\t" +
-	      							rs.getInt("authorizationLevel") + "\t" +
-	                           rs.getString("username") + "\t" +
-	                           rs.getString("password") + "\t" +
-	                           rs.getString("fullName") + "\t" +
-	                           rs.getString("address") + "\t" +                                   
-	                           rs.getInt("phoneNumber") + "\t" +
-	                           rs.getString("email") + "\t" +
-		          				   rs.getBoolean("hasSavedCard") + "\t" +
-		          				   rs.getInt("cardNumber") + "\t" +
-		          				   rs.getString("cardHolderName") + "\t" +
-		          				   rs.getInt("cardCVC") + "\t" +
-		          				   rs.getString("cardExpiryDate")); //Ath, náum í með String, ekki getDate;
-		          				   */
-	      } //while (rs.next())
-		} //try block
+			while(rsUsers.next())
+			{
+				User u = new User();
+				u.setUserID(rsUsers.getInt("userID"));
+				u.setAuthorizationLevel(rsUsers.getInt("authorizationLevel"));
+				u.setUsername(rsUsers.getString("username"));
+				u.setPassword(rsUsers.getString("password"));
+				u.setFullName(rsUsers.getString("fullName"));
+				u.setAddress(rsUsers.getString("address"));
+				u.setPhoneNumber(rsUsers.getInt("phoneNumber"));
+				u.setEmail(rsUsers.getString("email"));
+				u.setHasSavedCard(rsUsers.getBoolean("hasSavedCard"));
+				if(u.getHasSavedCard())
+				{
+					u.setCardNumber(rsUsers.getInt("cardNumber"));
+					u.setCardHolderName(rsUsers.getString("cardHolderName"));
+					u.setCardCVC(rsUsers.getInt("cardCVC"));
+					creditCardExpiry = LocalDate.parse((rsUsers.getString("cardExpiryDate")), formatter);
+					mmyy[0] = creditCardExpiry.getMonthValue();
+					mmyy[1] = creditCardExpiry.getYear();
+					u.setCardExpiryDate(mmyy);
+				}
+				else
+				{
+					u.setCardNumber(0);
+					u.setCardHolderName("");
+					u.setCardCVC(0);
+					int[] noDate = {00,0000};
+					u.setCardExpiryDate(noDate);
+				}
+			users.add(u);	
+			} //while rsUsers.next()
+			
+		} //try
 		catch (SQLException e)
 		{
 			System.out.println(e.getMessage());
       }
-
+		return users;
 	} //selectAll()
+
+	
 	
 }

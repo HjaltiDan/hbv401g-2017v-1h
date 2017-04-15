@@ -2,7 +2,6 @@ package storage;
 import model.*;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
@@ -11,19 +10,18 @@ public class HotelStorage {
 	private ArrayList<Hotel> hotels;
 	private ArrayList<RoomsPerDay> allFreeRooms;
 	private RoomsPerDay roomOnDate;
-	private Date date;
 	private LocalDate selectedDay;
 	private int availableRooms;
 	private DateTimeFormatter formatter;
 	
 	
-	public HotelStorage(){
+	public HotelStorage()
+	{
 		hotels = new ArrayList<Hotel>();
 		allFreeRooms = new ArrayList<RoomsPerDay>();
 		formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd");
-		//formatter = formatter.withLocale( putAppropriateLocaleHere );  // Locale specifies human language for translating, and cultural norms for lowercase/uppercase and abbreviations and such. Example: Locale.US or Locale.CANADA_FRENCH
 	}
-	
+
 	private Connection connect() 
 	{
 		String url = "jdbc:sqlite:lib/1H.db";
@@ -43,7 +41,6 @@ public class HotelStorage {
 	{
 		hotels.clear();
 		String sqlAllHotels = "SELECT * FROM Hotels";
-		//String sqlAllHotels = "SELECT * FROM Hotels WHERE hotelID IS NOT null";
 		try 
 		(Connection conn = this.connect();
 		Statement stmtHotels = conn.createStatement(); 
@@ -83,17 +80,15 @@ public class HotelStorage {
 	   		ResultSet rsRooms = stmtRooms.executeQuery(sqlAllRoomsPerDay);
 	   		while (rsRooms.next())
 	   		{
+	   			int entryID = rsRooms.getInt("roomsPerDayID");
 	   			String stringDate = rsRooms.getString("date");
+	   			//selectedDay = LocalDate.parse(stringDate, formatter);
 	   			selectedDay = LocalDate.parse(stringDate);
-	   			//Old code when we were using Date rather than LocalDate:
-	   			//date = rsRooms.getDate("date");
-	   			//selectedDay = date.toLocalDate();
 	   			availableRooms = rsRooms.getInt("availableRooms");
-	   			roomOnDate = new RoomsPerDay(selectedDay, availableRooms);
+	   			roomOnDate = new RoomsPerDay(entryID, selectedDay, availableRooms);
 	   			allFreeRooms.add(roomOnDate);
-	   			//System.out.println("Hotel "+h.getName()+" has "+availableRooms+" rooms available on date "+selectedDay);
-	   		}
-	   		//System.out.println("Hotel "+h.getName()+ " has "+allFreeRooms.size()+" freeRoom entries");
+	     		}
+	   		
 	   		h.setFreeRoomsPerDate(allFreeRooms);
 	      	
 	   		h.setRating(rsHotels.getInt("rating"));
@@ -128,17 +123,6 @@ public class HotelStorage {
 	      	
 	      	h.setNearbyDayTour(rsHotels.getString("nearbyDayTours"));
 	      	
-	      	/*
-	      	//Old code, for reference. Meant for multiple strings.
-	      	String siteList = rsHotels.getString("nearestSites");
-	      	ArrayList<String> siteArray = new ArrayList<String>(Arrays.asList(siteList.split(", ")));
-	      	h.setNearestSites(siteArray);
-	      	
-	      	String tourList = rsHotels.getString("nearbyDayTours");
-	      	ArrayList<String> tourArray = new ArrayList<String>(Arrays.asList(tourList.split(", ")));
-	      	h.setNearestDayTours(tourArray);
-	      	*/
-	      	
 	      	hotels.add(h);
 	      } //while (rsRooms.next())
 		} //try block
@@ -148,10 +132,32 @@ public class HotelStorage {
 			System.out.println(e.getMessage());
       }
 		
-		//Test code for selectAll
-		//System.out.println("Finished selectAll(), have loaded "+hotels.size()+" hotels into the ArrayList");
-		
 		return hotels;
 	} //selectAll()
+
+	public void updateRoomAvailability(Hotel h, ArrayList<Integer> roomIDs, int guests)
+	{
+		try 
+		{
+			Connection conn = this.connect();
+			Statement insertStatement = conn.createStatement(); 
+			
+			for(Integer i : roomIDs)
+			{
+				String updateSQL = ("UPDATE RoomsPerDay SET availableRooms = availableRooms - "
+											+guests+" WHERE roomsPerDayID = "+i);
+				insertStatement.executeUpdate(updateSQL);
+			}
+		
+			conn.close();} //try
+
+		catch (SQLException e)
+		{
+			System.out.println("Error in SQL Selectall()");
+			System.out.println(e.getMessage());
+      }
+	 
+	} //updateRooomAvailability()
+
 	
 }
