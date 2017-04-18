@@ -515,7 +515,7 @@ public class SearchView extends Observable {
 		modelSites.addElement("Blue Lagoon");
 		modelSites.addElement("Þingvellir");
 		modelSites.addElement("Jökulsárlón");
-		modelSites.addElement("Dettifoss");
+		modelSites.addElement("Dynjandi");
 		modelSites.addElement("Vatnajökull");
 		modelSites.addElement("Jólahúsið");
 		listSites = new JList<String>(modelSites);
